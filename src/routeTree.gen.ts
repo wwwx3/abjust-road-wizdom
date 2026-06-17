@@ -9,38 +9,179 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RoleRouteImport } from './routes/role'
+import { Route as ReportRouteImport } from './routes/report'
+import { Route as OfficerRouteImport } from './routes/officer'
+import { Route as AnalyticsRouteImport } from './routes/analytics'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReportResultRouteImport } from './routes/report.result'
+import { Route as CitizenTimelineRouteImport } from './routes/citizen.timeline'
+import { Route as OfficerCaseIdRouteImport } from './routes/officer.case.$id'
 
+const RoleRoute = RoleRouteImport.update({
+  id: '/role',
+  path: '/role',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportRoute = ReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficerRoute = OfficerRouteImport.update({
+  id: '/officer',
+  path: '/officer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnalyticsRoute = AnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReportResultRoute = ReportResultRouteImport.update({
+  id: '/result',
+  path: '/result',
+  getParentRoute: () => ReportRoute,
+} as any)
+const CitizenTimelineRoute = CitizenTimelineRouteImport.update({
+  id: '/citizen/timeline',
+  path: '/citizen/timeline',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficerCaseIdRoute = OfficerCaseIdRouteImport.update({
+  id: '/case/$id',
+  path: '/case/$id',
+  getParentRoute: () => OfficerRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/analytics': typeof AnalyticsRoute
+  '/officer': typeof OfficerRouteWithChildren
+  '/report': typeof ReportRouteWithChildren
+  '/role': typeof RoleRoute
+  '/citizen/timeline': typeof CitizenTimelineRoute
+  '/report/result': typeof ReportResultRoute
+  '/officer/case/$id': typeof OfficerCaseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/analytics': typeof AnalyticsRoute
+  '/officer': typeof OfficerRouteWithChildren
+  '/report': typeof ReportRouteWithChildren
+  '/role': typeof RoleRoute
+  '/citizen/timeline': typeof CitizenTimelineRoute
+  '/report/result': typeof ReportResultRoute
+  '/officer/case/$id': typeof OfficerCaseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/analytics': typeof AnalyticsRoute
+  '/officer': typeof OfficerRouteWithChildren
+  '/report': typeof ReportRouteWithChildren
+  '/role': typeof RoleRoute
+  '/citizen/timeline': typeof CitizenTimelineRoute
+  '/report/result': typeof ReportResultRoute
+  '/officer/case/$id': typeof OfficerCaseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/analytics'
+    | '/officer'
+    | '/report'
+    | '/role'
+    | '/citizen/timeline'
+    | '/report/result'
+    | '/officer/case/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/analytics'
+    | '/officer'
+    | '/report'
+    | '/role'
+    | '/citizen/timeline'
+    | '/report/result'
+    | '/officer/case/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/analytics'
+    | '/officer'
+    | '/report'
+    | '/role'
+    | '/citizen/timeline'
+    | '/report/result'
+    | '/officer/case/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AnalyticsRoute: typeof AnalyticsRoute
+  OfficerRoute: typeof OfficerRouteWithChildren
+  ReportRoute: typeof ReportRouteWithChildren
+  RoleRoute: typeof RoleRoute
+  CitizenTimelineRoute: typeof CitizenTimelineRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/role': {
+      id: '/role'
+      path: '/role'
+      fullPath: '/role'
+      preLoaderRoute: typeof RoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/report': {
+      id: '/report'
+      path: '/report'
+      fullPath: '/report'
+      preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/officer': {
+      id: '/officer'
+      path: '/officer'
+      fullPath: '/officer'
+      preLoaderRoute: typeof OfficerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/analytics': {
+      id: '/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +189,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/report/result': {
+      id: '/report/result'
+      path: '/result'
+      fullPath: '/report/result'
+      preLoaderRoute: typeof ReportResultRouteImport
+      parentRoute: typeof ReportRoute
+    }
+    '/citizen/timeline': {
+      id: '/citizen/timeline'
+      path: '/citizen/timeline'
+      fullPath: '/citizen/timeline'
+      preLoaderRoute: typeof CitizenTimelineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/officer/case/$id': {
+      id: '/officer/case/$id'
+      path: '/case/$id'
+      fullPath: '/officer/case/$id'
+      preLoaderRoute: typeof OfficerCaseIdRouteImport
+      parentRoute: typeof OfficerRoute
+    }
   }
 }
 
+interface OfficerRouteChildren {
+  OfficerCaseIdRoute: typeof OfficerCaseIdRoute
+}
+
+const OfficerRouteChildren: OfficerRouteChildren = {
+  OfficerCaseIdRoute: OfficerCaseIdRoute,
+}
+
+const OfficerRouteWithChildren =
+  OfficerRoute._addFileChildren(OfficerRouteChildren)
+
+interface ReportRouteChildren {
+  ReportResultRoute: typeof ReportResultRoute
+}
+
+const ReportRouteChildren: ReportRouteChildren = {
+  ReportResultRoute: ReportResultRoute,
+}
+
+const ReportRouteWithChildren =
+  ReportRoute._addFileChildren(ReportRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AnalyticsRoute: AnalyticsRoute,
+  OfficerRoute: OfficerRouteWithChildren,
+  ReportRoute: ReportRouteWithChildren,
+  RoleRoute: RoleRoute,
+  CitizenTimelineRoute: CitizenTimelineRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
