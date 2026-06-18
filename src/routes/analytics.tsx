@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { RiskBadge } from "@/components/badges";
 import { ANALYTICS, MOCK_CASES } from "@/lib/abjust-data";
-import { Layers, FileText, FolderKanban, Flame, TrendingUp, MapPin, Building2 } from "lucide-react";
+import { useAllEscalations } from "@/lib/cases-store";
+import { ESCALATION_LADDER } from "@/lib/escalation";
+import { Layers, FileText, FolderKanban, Flame, TrendingUp, MapPin, Building2, Crown, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/analytics")({
