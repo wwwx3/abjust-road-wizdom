@@ -205,16 +205,18 @@ function EscalationPage() {
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold transition border",
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold transition border text-left",
                 filter === f.key
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-card text-foreground border-border hover:bg-accent",
               )}
             >
-              {f.label}
+              <span className="whitespace-pre-line">
+                {f.label === "เสี่ยงสูง · ยังไม่มีผู้ดูเเล\n0" ? "เสี่ยงสูง · ยังไม่มีผู้ดูเเล" : f.label}
+              </span>
               <span
                 className={cn(
-                  "rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+                  "rounded-full px-1.5 py-0.5 text-[10px] font-bold shrink-0 self-center",
                   filter === f.key ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground",
                 )}
               >
