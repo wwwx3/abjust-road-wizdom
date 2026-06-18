@@ -166,75 +166,11 @@ const HOTSPOTS: Hotspot[] = [
   },
 ];
 
-// ---- Bangkok district choropleth (24 simplified counties) ----
-type District = {
-  name: string;
-  unresolved: number;
-  pushedBack: number;
-  col: number;
-  row: number;
-};
+// District choropleth uses real Bangkok geometry from BKK_DISTRICTS (50 เขต)
+const DISTRICTS = BKK_DISTRICTS;
+const DISTRICT_MAX = BKK_DISTRICT_MAX;
 
-const DISTRICT_GRID: District[] = [
-  // row 0 (north)
-  { name: "สายไหม", unresolved: 8, pushedBack: 2, col: 0, row: 0 },
-  { name: "ดอนเมือง", unresolved: 12, pushedBack: 3, col: 1, row: 0 },
-  { name: "หลักสี่", unresolved: 6, pushedBack: 2, col: 2, row: 0 },
-  { name: "บางเขน", unresolved: 10, pushedBack: 3, col: 3, row: 0 },
-  { name: "คลองสามวา", unresolved: 7, pushedBack: 2, col: 4, row: 0 },
-  { name: "มีนบุรี", unresolved: 9, pushedBack: 3, col: 5, row: 0 },
-  // row 1
-  { name: "บางซื่อ", unresolved: 11, pushedBack: 4, col: 0, row: 1 },
-  { name: "จตุจักร", unresolved: 22, pushedBack: 8, col: 1, row: 1 },
-  { name: "ลาดพร้าว", unresolved: 14, pushedBack: 5, col: 2, row: 1 },
-  { name: "บึงกุ่ม", unresolved: 8, pushedBack: 3, col: 3, row: 1 },
-  { name: "คันนายาว", unresolved: 5, pushedBack: 2, col: 4, row: 1 },
-  { name: "หนองจอก", unresolved: 4, pushedBack: 1, col: 5, row: 1 },
-  // row 2
-  { name: "ดุสิต", unresolved: 13, pushedBack: 4, col: 0, row: 2 },
-  { name: "ห้วยขวาง", unresolved: 24, pushedBack: 10, col: 1, row: 2 },
-  { name: "วังทองหลาง", unresolved: 11, pushedBack: 3, col: 2, row: 2 },
-  { name: "บางกะปิ", unresolved: 9, pushedBack: 3, col: 3, row: 2 },
-  { name: "สะพานสูง", unresolved: 6, pushedBack: 2, col: 4, row: 2 },
-  { name: "ลาดกระบัง", unresolved: 8, pushedBack: 3, col: 5, row: 2 },
-  // row 3 (south)
-  { name: "ปทุมวัน", unresolved: 28, pushedBack: 14, col: 0, row: 3 },
-  { name: "บางรัก", unresolved: 21, pushedBack: 9, col: 1, row: 3 },
-  { name: "วัฒนา", unresolved: 26, pushedBack: 11, col: 2, row: 3 },
-  { name: "คลองเตย", unresolved: 18, pushedBack: 7, col: 3, row: 3 },
-  { name: "พระโขนง", unresolved: 12, pushedBack: 4, col: 4, row: 3 },
-  { name: "บางนา", unresolved: 10, pushedBack: 3, col: 5, row: 3 },
-];
 
-const CELL_W = 13;
-const CELL_H = 15;
-const GRID_X0 = 8;
-const GRID_Y0 = 6;
-
-const DISTRICTS = DISTRICT_GRID.map((d) => {
-  // deterministic per-cell jitter so borders look organic, not a perfect grid
-  const seed = (d.col * 7 + d.row * 13) % 11;
-  const jx = ((seed % 5) - 2) * 0.35;
-  const jy = (((seed * 3) % 5) - 2) * 0.35;
-  const x = GRID_X0 + d.col * CELL_W + jx;
-  const y = GRID_Y0 + d.row * CELL_H + jy;
-  const w = CELL_W;
-  const h = CELL_H;
-  // rectangle with slight corner perturbation
-  const t1 = ((seed * 2) % 5) * 0.2;
-  const t2 = ((seed * 5) % 5) * 0.2;
-  const path = `M ${x} ${y + t1} L ${x + w - t2} ${y} L ${x + w} ${y + h - t1} L ${x + t2} ${y + h} Z`;
-  return {
-    name: d.name,
-    unresolved: d.unresolved,
-    pushedBack: d.pushedBack,
-    cx: x + w / 2,
-    cy: y + h / 2,
-    path,
-  };
-});
-
-const DISTRICT_MAX = Math.max(...DISTRICTS.map((d) => d.unresolved + d.pushedBack));
 
 function priorityScore(h: Hotspot): number {
   return Math.round(
