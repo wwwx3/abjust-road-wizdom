@@ -281,7 +281,7 @@ function DemoSimulatorCard({
         <div className="flex flex-col gap-2 shrink-0">
           <button
             onClick={onRun}
-            disabled={disabled || running}
+            disabled={running}
             className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background px-4 py-2.5 text-xs font-semibold hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <PlayCircle className="h-4 w-4" />
