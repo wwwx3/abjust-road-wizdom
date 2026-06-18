@@ -12,10 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RoleRouteImport } from './routes/role'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as PublicRouteImport } from './routes/public'
-import { Route as OfficerRouteImport } from './routes/officer'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OfficerIndexRouteImport } from './routes/officer.index'
 import { Route as ReportResultRouteImport } from './routes/report.result'
 import { Route as ReportProcessingRouteImport } from './routes/report.processing'
 import { Route as OfficerEscalationRouteImport } from './routes/officer.escalation'
@@ -37,11 +37,6 @@ const PublicRoute = PublicRouteImport.update({
   path: '/public',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OfficerRoute = OfficerRouteImport.update({
-  id: '/officer',
-  path: '/officer',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -57,6 +52,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OfficerIndexRoute = OfficerIndexRouteImport.update({
+  id: '/officer/',
+  path: '/officer/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReportResultRoute = ReportResultRouteImport.update({
   id: '/result',
   path: '/result',
@@ -68,9 +68,9 @@ const ReportProcessingRoute = ReportProcessingRouteImport.update({
   getParentRoute: () => ReportRoute,
 } as any)
 const OfficerEscalationRoute = OfficerEscalationRouteImport.update({
-  id: '/escalation',
-  path: '/escalation',
-  getParentRoute: () => OfficerRoute,
+  id: '/officer/escalation',
+  path: '/officer/escalation',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CitizenTimelineRoute = CitizenTimelineRouteImport.update({
   id: '/citizen/timeline',
@@ -78,16 +78,15 @@ const CitizenTimelineRoute = CitizenTimelineRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfficerCaseIdRoute = OfficerCaseIdRouteImport.update({
-  id: '/case/$id',
-  path: '/case/$id',
-  getParentRoute: () => OfficerRoute,
+  id: '/officer/case/$id',
+  path: '/officer/case/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
-  '/officer': typeof OfficerRouteWithChildren
   '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
@@ -95,13 +94,13 @@ export interface FileRoutesByFullPath {
   '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
+  '/officer/': typeof OfficerIndexRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
-  '/officer': typeof OfficerRouteWithChildren
   '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
@@ -109,6 +108,7 @@ export interface FileRoutesByTo {
   '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
+  '/officer': typeof OfficerIndexRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
 }
 export interface FileRoutesById {
@@ -116,7 +116,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
-  '/officer': typeof OfficerRouteWithChildren
   '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
@@ -124,6 +123,7 @@ export interface FileRoutesById {
   '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
+  '/officer/': typeof OfficerIndexRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
 }
 export interface FileRouteTypes {
@@ -132,7 +132,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/analytics'
-    | '/officer'
     | '/public'
     | '/report'
     | '/role'
@@ -140,13 +139,13 @@ export interface FileRouteTypes {
     | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
+    | '/officer/'
     | '/officer/case/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/analytics'
-    | '/officer'
     | '/public'
     | '/report'
     | '/role'
@@ -154,13 +153,13 @@ export interface FileRouteTypes {
     | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
+    | '/officer'
     | '/officer/case/$id'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/analytics'
-    | '/officer'
     | '/public'
     | '/report'
     | '/role'
@@ -168,6 +167,7 @@ export interface FileRouteTypes {
     | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
+    | '/officer/'
     | '/officer/case/$id'
   fileRoutesById: FileRoutesById
 }
@@ -175,11 +175,13 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AnalyticsRoute: typeof AnalyticsRoute
-  OfficerRoute: typeof OfficerRouteWithChildren
   PublicRoute: typeof PublicRoute
   ReportRoute: typeof ReportRouteWithChildren
   RoleRoute: typeof RoleRoute
   CitizenTimelineRoute: typeof CitizenTimelineRoute
+  OfficerEscalationRoute: typeof OfficerEscalationRoute
+  OfficerIndexRoute: typeof OfficerIndexRoute
+  OfficerCaseIdRoute: typeof OfficerCaseIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -205,13 +207,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/officer': {
-      id: '/officer'
-      path: '/officer'
-      fullPath: '/officer'
-      preLoaderRoute: typeof OfficerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/analytics': {
       id: '/analytics'
       path: '/analytics'
@@ -233,6 +228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/officer/': {
+      id: '/officer/'
+      path: '/officer'
+      fullPath: '/officer/'
+      preLoaderRoute: typeof OfficerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/report/result': {
       id: '/report/result'
       path: '/result'
@@ -249,10 +251,10 @@ declare module '@tanstack/react-router' {
     }
     '/officer/escalation': {
       id: '/officer/escalation'
-      path: '/escalation'
+      path: '/officer/escalation'
       fullPath: '/officer/escalation'
       preLoaderRoute: typeof OfficerEscalationRouteImport
-      parentRoute: typeof OfficerRoute
+      parentRoute: typeof rootRouteImport
     }
     '/citizen/timeline': {
       id: '/citizen/timeline'
@@ -263,26 +265,13 @@ declare module '@tanstack/react-router' {
     }
     '/officer/case/$id': {
       id: '/officer/case/$id'
-      path: '/case/$id'
+      path: '/officer/case/$id'
       fullPath: '/officer/case/$id'
       preLoaderRoute: typeof OfficerCaseIdRouteImport
-      parentRoute: typeof OfficerRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface OfficerRouteChildren {
-  OfficerEscalationRoute: typeof OfficerEscalationRoute
-  OfficerCaseIdRoute: typeof OfficerCaseIdRoute
-}
-
-const OfficerRouteChildren: OfficerRouteChildren = {
-  OfficerEscalationRoute: OfficerEscalationRoute,
-  OfficerCaseIdRoute: OfficerCaseIdRoute,
-}
-
-const OfficerRouteWithChildren =
-  OfficerRoute._addFileChildren(OfficerRouteChildren)
 
 interface ReportRouteChildren {
   ReportProcessingRoute: typeof ReportProcessingRoute
@@ -301,11 +290,13 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AnalyticsRoute: AnalyticsRoute,
-  OfficerRoute: OfficerRouteWithChildren,
   PublicRoute: PublicRoute,
   ReportRoute: ReportRouteWithChildren,
   RoleRoute: RoleRoute,
   CitizenTimelineRoute: CitizenTimelineRoute,
+  OfficerEscalationRoute: OfficerEscalationRoute,
+  OfficerIndexRoute: OfficerIndexRoute,
+  OfficerCaseIdRoute: OfficerCaseIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
