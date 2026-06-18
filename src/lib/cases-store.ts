@@ -2,6 +2,12 @@
 // citizen reports can flow into the same dataset for the prototype.
 import { useSyncExternalStore } from "react";
 import { MOCK_CASES, type Case, type Status } from "./abjust-data";
+import {
+  appendAudit,
+  escalateOnce,
+  seedEscalation,
+  type EscalationState,
+} from "./escalation";
 
 const MINE_KEY = "abjust:mine";
 const SEED_MINE = ["ABJ-2410-0871"];
