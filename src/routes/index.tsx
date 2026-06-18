@@ -86,7 +86,7 @@ function Home() {
                 <br />
                 <span className="bg-gradient-to-r from-brand to-success bg-clip-text text-transparent">สู่การจัดการปัญหาจราจร</span>
                 <br />
-                ที่ดที่เป็นระบบ
+                ที่เป็นระบบ
               </h1>
               <p className="mt-5 max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed">
                 Abjust คือ <span className="font-semibold text-foreground">Traffic-Risk Intelligence Layer</span> ที่ช่วยสรุป จัดลำดับความเสี่ยง รวมรายงานซ้ำ และติดตามความคืบหน้าของปัญหาจราจรในกรุงเทพฯ
