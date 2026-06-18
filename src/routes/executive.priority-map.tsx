@@ -329,16 +329,8 @@ function PriorityMapPage() {
             </div>
 
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-border bg-[oklch(0.985_0.005_85)]">
-              <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 75" preserveAspectRatio="none">
-                {/* River backdrop */}
-                <path
-                  d="M -5 20 C 15 30, 25 10, 40 25 S 65 55, 80 45 S 95 70, 110 60"
-                  stroke="oklch(0.82 0.07 220)"
-                  strokeWidth="2"
-                  fill="none"
-                  opacity="0.4"
-                />
-                {/* District choropleth */}
+              <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 75" preserveAspectRatio="xMidYMid meet">
+                {/* District choropleth — real Bangkok geometry */}
                 {DISTRICTS.map((d) => {
                   const t = Math.min(1, (d.unresolved + d.pushedBack) / DISTRICT_MAX);
                   const L = 0.96 - t * 0.46;
@@ -350,10 +342,11 @@ function PriorityMapPage() {
                       key={d.name}
                       d={d.path}
                       fill={fill}
-                      stroke={isSel ? "oklch(0.2 0.05 25)" : "oklch(1 0 0)"}
-                      strokeWidth={isSel ? 0.7 : 0.35}
+                      stroke={isSel ? "oklch(0.2 0.05 25)" : "oklch(1 0 0 / 0.85)"}
+                      strokeWidth={isSel ? 1.4 : 0.6}
+                      strokeLinejoin="round"
                       vectorEffect="non-scaling-stroke"
-                      className="cursor-pointer"
+                      className="cursor-pointer transition-opacity hover:opacity-90"
                       onClick={() => {
                         const h = HOTSPOTS.find((x) => x.district === d.name);
                         if (h) setSelectedId(h.id);
@@ -363,26 +356,32 @@ function PriorityMapPage() {
                     </path>
                   );
                 })}
-                {/* Labels */}
-                {DISTRICTS.map((d) => {
-                  const t = Math.min(1, (d.unresolved + d.pushedBack) / DISTRICT_MAX);
-                  return (
-                    <text
-                      key={`l-${d.name}`}
-                      x={d.cx}
-                      y={d.cy}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      fontSize="2"
-                      fontWeight={600}
-                      fill={t > 0.55 ? "oklch(0.99 0 0)" : "oklch(0.3 0.02 25)"}
-                      style={{ pointerEvents: "none" }}
-                    >
-                      {d.name}
-                    </text>
-                  );
-                })}
+                {/* Labels — only show on the top-12 most-loaded districts to avoid clutter */}
+                {[...DISTRICTS]
+                  .sort((a, b) => (b.unresolved + b.pushedBack) - (a.unresolved + a.pushedBack))
+                  .slice(0, 12)
+                  .map((d) => {
+                    const t = Math.min(1, (d.unresolved + d.pushedBack) / DISTRICT_MAX);
+                    return (
+                      <text
+                        key={`l-${d.name}`}
+                        x={d.cx}
+                        y={d.cy}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize="1.6"
+                        fontWeight={700}
+                        fill={t > 0.55 ? "oklch(0.99 0 0)" : "oklch(0.25 0.02 25)"}
+                        style={{ pointerEvents: "none", paintOrder: "stroke" }}
+                        stroke={t > 0.55 ? "oklch(0.3 0.05 25 / 0.4)" : "oklch(1 0 0 / 0.7)"}
+                        strokeWidth="0.25"
+                      >
+                        {d.name}
+                      </text>
+                    );
+                  })}
               </svg>
+
 
               {/* Markers */}
               {filtered.map((h) => (
