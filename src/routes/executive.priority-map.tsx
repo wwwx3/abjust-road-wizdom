@@ -383,33 +383,10 @@ function PriorityMapPage() {
               </svg>
 
 
-              {/* Markers */}
-              {filtered.map((h) => (
-                <button
-                  key={h.id}
-                  onClick={() => setSelectedId(h.id)}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 group"
-                  style={{ left: `${h.x}%`, top: `${h.y}%` }}
-                  aria-label={h.name}
-                >
-                  <span
-                    className={cn(
-                      "relative grid place-items-center h-6 w-6 rounded-full ring-2 ring-background shadow-md transition",
-                      STATUS_COLOR[h.status],
-                      selected.id === h.id && "scale-125",
-                    )}
-                  >
-                    <MapPin className="h-3 w-3 text-white" />
-                  </span>
-                  <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 mt-1 whitespace-nowrap rounded-md bg-foreground/90 px-1.5 py-0.5 text-[9px] font-medium text-background opacity-0 group-hover:opacity-100">
-                    {h.name}
-                  </span>
-                </button>
-              ))}
-
               <div className="absolute bottom-2 left-2 rounded-md bg-background/90 backdrop-blur px-2 py-1 text-[10px] font-semibold text-muted-foreground">
-                กรุงเทพมหานคร · 24 เขต · ความเข้มสีแดง = เคสค้าง + ถูกตีกลับ
+                กรุงเทพมหานคร · 50 เขต · ความเข้มสีแดง = เคสค้าง + ถูกตีกลับ
               </div>
+
 
               <div className="absolute bottom-2 right-2 flex items-center gap-1.5 rounded-md bg-background/90 backdrop-blur px-2 py-1 text-[9.5px] font-medium text-muted-foreground">
                 <span>น้อย</span>
