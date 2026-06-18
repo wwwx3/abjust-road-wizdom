@@ -94,7 +94,7 @@ function EscalationPage() {
 
   const filters: { key: FilterKey; label: string; count: number }[] = [
     { key: "overdue", label: "ค้างเกินกำหนด", count: overdue.length },
-    { key: "noOwner", label: "เสี่ยงสูง · ยังไม่มีผู้ดูเเล\n0", count: noOwnerHighRisk.length },
+    { key: "noOwner", label: "เสี่ยงสูง · ยังไม่มีผู้ดูเเล\n", count: noOwnerHighRisk.length },
     { key: "coordinator", label: "อยู่ที่ผู้ประสานงานกลาง", count: atCoordinator.length },
     { key: "multi", label: "ถูกส่งต่อหลายครั้ง", count: multiTransfer.length },
     { key: "supervisor", label: "ต้องเห็นโดยหัวหน้าหน่วยงาน", count: atSupervisor.length },
