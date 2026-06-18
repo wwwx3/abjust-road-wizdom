@@ -121,7 +121,7 @@ export function AppShell({ children, title, subtitle }: { children: ReactNode; t
 
       {/* Main */}
       <div className="lg:pl-[260px]">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/85 backdrop-blur px-4 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border/60 bg-background/70 backdrop-blur-xl px-4 sm:px-6 lg:px-8">
           <button className="lg:hidden text-foreground" onClick={() => setOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>
