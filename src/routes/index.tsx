@@ -81,12 +81,10 @@ function Home() {
                 <ShieldCheck className="h-3.5 w-3.5 text-success" />
                 Civic-tech prototype · Bangkok Hackathon
               </div>
-              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-[52px] font-extrabold tracking-tight text-foreground leading-[1.1]">
-                จากรายงานของประชาชน
-                <br />
-                <span className="bg-gradient-to-r from-brand to-success bg-clip-text text-transparent">สู่การจัดการปัญหาจราจร</span>
-                <br />
-                ที่เป็นระบบ
+              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-[52px] font-extrabold tracking-tight text-foreground leading-[1.1] whitespace-pre-line">
+                จากรายงานของประชาชน{"\n"}
+                <span className="bg-gradient-to-r from-brand to-success bg-clip-text text-transparent">สู่การจัดการปัญหาจราจร</span>{"\n"}
+                อย่างเป็นระบบ
               </h1>
               <p className="mt-5 max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed">
                 Abjust คือ <span className="font-semibold text-foreground">Traffic-Risk Intelligence Layer</span> ที่ช่วยสรุป จัดลำดับความเสี่ยง รวมรายงานซ้ำ และติดตามความคืบหน้าของปัญหาจราจรในกรุงเทพฯ
