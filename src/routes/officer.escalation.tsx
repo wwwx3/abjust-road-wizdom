@@ -282,9 +282,9 @@ function DemoSimulatorCard({
           <button
             onClick={onRun}
             disabled={running}
-            className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background px-4 py-2.5 text-xs font-semibold hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 rounded-2xl bg-foreground text-background px-8 py-4 text-sm font-bold hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
           >
-            <PlayCircle className="h-4 w-4" />
+            <PlayCircle className="h-5 w-5" />
             {running ? "กำลังจำลอง…" : "เริ่มจำลองสถานการณ์"}
           </button>
           <button
