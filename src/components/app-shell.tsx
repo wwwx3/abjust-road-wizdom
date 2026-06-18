@@ -14,19 +14,17 @@ import {
 import { useState, type ReactNode } from "react";
 import { useRole } from "@/lib/use-role";
 import { cn } from "@/lib/utils";
+import logoUrl from "@/assets/abjust-logo.jpg";
 
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link to="/" className="flex items-center gap-2.5 group">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-        <div className="flex items-end gap-[2px] leading-none">
-          <span className="text-brand text-lg font-black">A</span>
-          <span className="text-success text-lg font-black">j</span>
-        </div>
+      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand/25 via-background to-success/25 ring-1 ring-border/60 shadow-sm overflow-hidden">
+        <img src={logoUrl} alt="Abjust" className="h-9 w-9 object-contain" />
       </div>
       {!compact && (
         <div className="leading-tight">
-          <div className="text-[15px] font-bold tracking-tight text-foreground">Abjust</div>
+          <div className="text-[15px] font-bold tracking-tight bg-gradient-to-r from-brand to-success bg-clip-text text-transparent">Abjust</div>
           <div className="text-[10.5px] font-medium text-muted-foreground -mt-0.5">
             Bangkok Traffic Risk Triage
           </div>
@@ -62,11 +60,11 @@ export function AppShell({ children, title, subtitle }: { children: ReactNode; t
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-[260px] border-r border-sidebar-border bg-sidebar transition-transform lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-[260px] border-r border-sidebar-border bg-gradient-to-b from-[oklch(0.985_0.018_60)] via-sidebar to-[oklch(0.96_0.03_150/0.6)] backdrop-blur transition-transform lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
@@ -123,7 +121,7 @@ export function AppShell({ children, title, subtitle }: { children: ReactNode; t
 
       {/* Main */}
       <div className="lg:pl-[260px]">
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/85 backdrop-blur px-4 sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border/60 bg-background/70 backdrop-blur-xl px-4 sm:px-6 lg:px-8">
           <button className="lg:hidden text-foreground" onClick={() => setOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>
