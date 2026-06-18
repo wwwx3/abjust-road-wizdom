@@ -16,6 +16,18 @@ function AnalyticsPage() {
   const a = ANALYTICS;
   const maxCat = Math.max(...a.topCategories.map((c) => c.count));
   const totalStatus = a.statusBreakdown.reduce((s, x) => s + x.count, 0);
+  const esc = useAllEscalations();
+  const execStats = {
+    overdue: esc.filter((x) => x.state.overdue).length,
+    highRiskUnassigned: esc.filter((x) => x.case.riskLevel === "สูงมาก" && x.case.status === "รับเรื่องแล้ว").length,
+    avgAcceptHours: 4.2,
+    escalated: esc.filter((x) => x.state.level >= 2).length,
+    needExec: esc.filter((x) => x.state.level >= 4).length,
+    resolvedPct: Math.round(
+      (a.statusBreakdown.find((s) => s.status === "แก้ไขเสร็จสิ้น")!.count / totalStatus) * 100,
+    ),
+  };
+
 
   return (
     <AppShell
