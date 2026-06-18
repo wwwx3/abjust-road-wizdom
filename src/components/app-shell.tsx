@@ -10,6 +10,7 @@ import {
   Search,
   Menu,
   X,
+  ShieldAlert,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useRole } from "@/lib/use-role";
