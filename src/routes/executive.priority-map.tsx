@@ -405,8 +405,10 @@ function PriorityMapPage() {
               </div>
             </div>
 
+            <DistrictInsight name={selectedDistrict} />
+
             <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-              แผนที่ผ่าเขตการปกครองของกรุงเทพฯ ออกเป็น 24 เขต ความเข้มของสีแดงในแต่ละเขตสะท้อน <span className="font-semibold text-foreground">จำนวนเคสที่ยังไม่ได้รับการแก้ไข</span> รวมกับ <span className="font-semibold text-foreground">เคสที่ถูกหน่วยงานตีกลับหรือปฏิเสธ</span> เพื่อให้ผู้บริหารเห็นภาระคงค้างเชิงพื้นที่และจัดลำดับการติดตามเชิงโครงสร้าง
+              คลิกที่เขตใดก็ได้บนแผนที่เพื่อดู <span className="font-semibold text-foreground">ปัญหาที่เกิดบ่อยที่สุดในเขตนั้น</span> พร้อม <span className="font-semibold text-foreground">ข้อเสนอแนะเชิงป้องกัน</span> สำหรับการวางนโยบายระยะยาว
             </p>
           </div>
 
