@@ -207,6 +207,7 @@ function PriorityMapPage() {
   const [onlyRecurring, setOnlyRecurring] = useState(false);
   const [onlyHighRisk, setOnlyHighRisk] = useState(false);
   const [selectedId, setSelectedId] = useState<string>(HOTSPOTS[0].id);
+  const [selectedDistrict, setSelectedDistrict] = useState<string>(BKK_DISTRICTS[0].name);
 
   const filtered = useMemo(() => {
     return HOTSPOTS.filter((h) => {
