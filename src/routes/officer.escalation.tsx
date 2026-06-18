@@ -137,7 +137,7 @@ function EscalationPage() {
           <Kpi icon={<Users className="h-4 w-4" />} tone="bg-info/10 text-info" label="เคสรอผู้ประสานงานกลาง" value={atCoordinator.length} />
           <Kpi icon={<Repeat className="h-4 w-4" />} tone="bg-warning/10 text-[oklch(0.45_0.13_60)]" label="เคสที่ถูกส่งต่อหลายครั้ง" value={multiTransfer.length} />
           <Kpi icon={<ShieldAlert className="h-4 w-4" />} tone="bg-[oklch(0.95_0.05_295)] text-[oklch(0.4_0.15_295)]" label="เคสที่ต้องเห็นโดยหัวหน้าหน่วยงาน" value={atSupervisor.length} />
-          <Kpi icon={<Crown className="h-4 w-4" />} tone="bg-brand/15 text-[oklch(0.42_0.13_60)]" label="เคสที่ต้องแสดงใน Dashboard ผู้บริหาร" value={atExecutive.length} />
+          <Kpi icon={<Crown className="h-4 w-4" />} tone="bg-brand/15 text-[oklch(0.42_0.13_60)]" label="เคสที่ต้องแสดงให้ผู้บริหารเมือง" value={atExecutive.length} />
         </div>
 
         {/* Escalation ladder reference */}
