@@ -1,21 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Logo } from "@/components/app-shell";
-import {
-  Sparkles,
-  Gauge,
-  Layers,
-  History,
-  ArrowRight,
-  ShieldCheck,
-  MapPin,
-  AlertTriangle,
-} from "lucide-react";
+import { Sparkles, Gauge, Layers, History, ArrowRight, ShieldCheck, MapPin, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Abjust — Bangkok Traffic Risk Triage" },
-      { name: "description", content: "Traffic-Risk Intelligence Layer สำหรับจัดลำดับ สรุป และติดตามรายงานปัญหาจราจรในกรุงเทพฯ" },
+      { name: "description", content: "Traffic-Risk Intelligence Layer ระบบติดตามและลำดับความสำคัญเหตุจราจร" },
     ],
   }),
   component: Home,
@@ -55,9 +46,15 @@ function Home() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo />
           <nav className="hidden md:flex items-center gap-7 text-sm text-muted-foreground">
-            <Link to="/about" className="hover:text-foreground transition">เกี่ยวกับ</Link>
-            <Link to="/officer" className="hover:text-foreground transition">ตัวอย่าง Dashboard</Link>
-            <Link to="/analytics" className="hover:text-foreground transition">Analytics</Link>
+            <Link to="/about" className="hover:text-foreground transition">
+              เกี่ยวกับ
+            </Link>
+            <Link to="/officer" className="hover:text-foreground transition">
+              ตัวอย่าง Dashboard
+            </Link>
+            <Link to="/analytics" className="hover:text-foreground transition">
+              Analytics
+            </Link>
           </nav>
           <Link
             to="/role"
@@ -88,17 +85,27 @@ function Home() {
                 ที่จัดลำดับและติดตามได้
               </h1>
               <p className="mt-5 max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed">
-                Abjust คือ <span className="font-semibold text-foreground">Traffic-Risk Intelligence Layer</span> ที่ช่วยสรุป จัดลำดับความเสี่ยง รวมรายงานซ้ำ และติดตามความคืบหน้าของปัญหาจราจรในกรุงเทพฯ
+                Abjust คือ <span className="font-semibold text-foreground">Traffic-Risk Intelligence Layer</span>{" "}
+                ที่ช่วยสรุป จัดลำดับความเสี่ยง รวมรายงานซ้ำ และติดตามความคืบหน้าของปัญหาจราจรในกรุงเทพฯ
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <Link to="/report" className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 transition">
+                <Link
+                  to="/report"
+                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 transition"
+                >
                   เริ่มแจ้งปัญหา <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link to="/role" className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent transition">
+                <Link
+                  to="/role"
+                  className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent transition"
+                >
                   เลือกบทบาท
                 </Link>
-                <Link to="/officer" className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent transition">
+                <Link
+                  to="/officer"
+                  className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent transition"
+                >
                   ดู Dashboard ตัวอย่าง
                 </Link>
               </div>
@@ -109,7 +116,8 @@ function Home() {
               </div>
 
               <div className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-medium text-foreground">Abjust</span> คือ Risk Intelligence Layer สำหรับรายงานปัญหาจราจรในกรุงเทพฯ
+                <span className="font-medium text-foreground">Abjust</span> คือ Risk Intelligence Layer
+                สำหรับรายงานปัญหาจราจรในกรุงเทพฯ
               </div>
             </div>
 
@@ -127,12 +135,32 @@ function Home() {
                 </div>
                 <div className="mt-5 space-y-3">
                   {[
-                    { id: "ABJ-2410-0871", title: "รถจอดขวางทางเข้ารถพยาบาล รพ.จุฬาฯ", level: "สูงมาก", score: 92, tone: "bg-danger" },
-                    { id: "ABJ-2410-0865", title: "ไฟแดงค้าง แยกอโศก-สุขุมวิท", level: "สูงมาก", score: 88, tone: "bg-danger" },
-                    { id: "ABJ-2410-0859", title: "น้ำท่วมขังถนนสุขุมวิท 71", level: "สูง", score: 81, tone: "bg-brand" },
+                    {
+                      id: "ABJ-2410-0871",
+                      title: "รถจอดขวางทางเข้ารถพยาบาล รพ.จุฬาฯ",
+                      level: "สูงมาก",
+                      score: 92,
+                      tone: "bg-danger",
+                    },
+                    {
+                      id: "ABJ-2410-0865",
+                      title: "ไฟแดงค้าง แยกอโศก-สุขุมวิท",
+                      level: "สูงมาก",
+                      score: 88,
+                      tone: "bg-danger",
+                    },
+                    {
+                      id: "ABJ-2410-0859",
+                      title: "น้ำท่วมขังถนนสุขุมวิท 71",
+                      level: "สูง",
+                      score: 81,
+                      tone: "bg-brand",
+                    },
                   ].map((c) => (
                     <div key={c.id} className="flex items-center gap-3 rounded-xl border border-border p-3">
-                      <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${c.tone} text-white text-sm font-bold`}>
+                      <div
+                        className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${c.tone} text-white text-sm font-bold`}
+                      >
                         {c.score}
                       </div>
                       <div className="min-w-0 flex-1">
