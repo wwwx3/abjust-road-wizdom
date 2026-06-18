@@ -33,7 +33,7 @@ export const ESCALATION_LADDER: EscalationStep[] = [
   },
   {
     level: 4,
-    label: "Dashboard ผู้บริหารเมือง",
+    label: "ผู้บริหารเมือง",
     owner: "ผู้บริหารระดับเมือง",
     description: "เคสถูกแสดงใน Dashboard ผู้บริหาร เพื่อการตัดสินใจระดับนโยบาย",
   },
