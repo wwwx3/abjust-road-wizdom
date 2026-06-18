@@ -16,6 +16,7 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReportResultRouteImport } from './routes/report.result'
+import { Route as ReportProcessingRouteImport } from './routes/report.processing'
 import { Route as CitizenTimelineRouteImport } from './routes/citizen.timeline'
 import { Route as OfficerCaseIdRouteImport } from './routes/officer.case.$id'
 
@@ -54,6 +55,11 @@ const ReportResultRoute = ReportResultRouteImport.update({
   path: '/result',
   getParentRoute: () => ReportRoute,
 } as any)
+const ReportProcessingRoute = ReportProcessingRouteImport.update({
+  id: '/processing',
+  path: '/processing',
+  getParentRoute: () => ReportRoute,
+} as any)
 const CitizenTimelineRoute = CitizenTimelineRouteImport.update({
   id: '/citizen/timeline',
   path: '/citizen/timeline',
@@ -73,6 +79,7 @@ export interface FileRoutesByFullPath {
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
 }
@@ -84,6 +91,7 @@ export interface FileRoutesByTo {
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
 }
@@ -96,6 +104,7 @@ export interface FileRoutesById {
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
 }
@@ -109,6 +118,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/report/processing'
     | '/report/result'
     | '/officer/case/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -120,6 +130,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/report/processing'
     | '/report/result'
     | '/officer/case/$id'
   id:
@@ -131,6 +142,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/report/processing'
     | '/report/result'
     | '/officer/case/$id'
   fileRoutesById: FileRoutesById
@@ -196,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportResultRouteImport
       parentRoute: typeof ReportRoute
     }
+    '/report/processing': {
+      id: '/report/processing'
+      path: '/processing'
+      fullPath: '/report/processing'
+      preLoaderRoute: typeof ReportProcessingRouteImport
+      parentRoute: typeof ReportRoute
+    }
     '/citizen/timeline': {
       id: '/citizen/timeline'
       path: '/citizen/timeline'
@@ -225,10 +244,12 @@ const OfficerRouteWithChildren =
   OfficerRoute._addFileChildren(OfficerRouteChildren)
 
 interface ReportRouteChildren {
+  ReportProcessingRoute: typeof ReportProcessingRoute
   ReportResultRoute: typeof ReportResultRoute
 }
 
 const ReportRouteChildren: ReportRouteChildren = {
+  ReportProcessingRoute: ReportProcessingRoute,
   ReportResultRoute: ReportResultRoute,
 }
 
