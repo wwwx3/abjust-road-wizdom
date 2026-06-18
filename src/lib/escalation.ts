@@ -147,13 +147,19 @@ export function seedEscalation(c: Case): EscalationState {
       level: 1,
     });
   }
+  const accepted = c.status !== "รับเรื่องแล้ว";
   return {
     level: 1,
-    reason: "เคสอยู่กับหน่วยงานหลักที่ถูกมอบหมาย",
+    reason: accepted
+      ? "เคสอยู่กับหน่วยงานหลักและดำเนินการอยู่"
+      : "รอหน่วยงานหลักรับเคส",
     lastEscalatedAt: createdAt,
     deadlineAt: createdAt + deadlineMs,
     transferCount: 0,
     overdue: false,
+    accepted,
+    currentOwner: c.unit,
+    nextAction: defaultNextAction(c),
     audit,
   };
 }
@@ -173,10 +179,10 @@ export function escalateOnce(
     (nextLevel === 2
       ? `ไม่มีการรับเคสภายใน ${DEADLINE_HOURS[c.riskLevel]} ชั่วโมง ระบบส่งต่อผู้ประสานงานกลางอัตโนมัติ`
       : nextLevel === 3
-        ? "ไม่มีการอัปเดตภายในเวลาที่กำหนด ระบบส่งต่อหัวหน้าหน่วยงาน"
+        ? "ผู้ประสานงานกลางยังไม่มีการอัปเดตภายในเวลาที่กำหนด ระบบยกระดับไปยังหัวหน้าหน่วยงาน"
         : nextLevel === 4
-          ? "เคสยังไม่ถูกดำเนินการ ระบบแสดงใน Dashboard ผู้บริหารเมือง"
-          : "เคสค้างเกินกำหนดสะสม ระบบรวมในภาพรวมสาธารณะ");
+          ? "เคสความเสี่ยงสูงมากยังค้างอยู่ ระบบแสดงเคสใน Dashboard ผู้บริหารเมืองเพื่อให้เห็นจุดค้างของกระบวนการ"
+          : "เคสค้างเกินกำหนดสะสม ระบบรวมในภาพรวมสาธารณะแบบไม่เปิดเผยข้อมูลส่วนบุคคล");
   return {
     ...state,
     level: nextLevel,
@@ -184,13 +190,15 @@ export function escalateOnce(
     lastEscalatedAt: now,
     deadlineAt: now + Math.max(3, Math.floor(DEADLINE_HOURS[c.riskLevel] / 2)) * 3600_000,
     overdue: true,
+    accepted: false,
+    currentOwner: step.owner,
     audit: [
       ...state.audit,
       {
         id: evtId(),
         ts: now,
         actor: "ระบบ Abjust",
-        action: `เคสถูกส่งต่อไปยัง ${step.label}`,
+        action: `ส่งต่ออัตโนมัติไปยัง ${step.label}`,
         reason,
         level: nextLevel,
       },
