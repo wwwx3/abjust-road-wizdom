@@ -18,6 +18,7 @@ import {
   Filter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BKK_DISTRICTS, BKK_DISTRICT_MAX } from "@/lib/bkk-districts";
 
 export const Route = createFileRoute("/executive/priority-map")({
   head: () => ({
