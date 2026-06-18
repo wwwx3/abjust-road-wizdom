@@ -18,6 +18,7 @@ import {
   Filter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BKK_DISTRICTS, BKK_DISTRICT_MAX } from "@/lib/bkk-districts";
 
 export const Route = createFileRoute("/executive/priority-map")({
   head: () => ({
@@ -165,75 +166,11 @@ const HOTSPOTS: Hotspot[] = [
   },
 ];
 
-// ---- Bangkok district choropleth (24 simplified counties) ----
-type District = {
-  name: string;
-  unresolved: number;
-  pushedBack: number;
-  col: number;
-  row: number;
-};
+// District choropleth uses real Bangkok geometry from BKK_DISTRICTS (50 เขต)
+const DISTRICTS = BKK_DISTRICTS;
+const DISTRICT_MAX = BKK_DISTRICT_MAX;
 
-const DISTRICT_GRID: District[] = [
-  // row 0 (north)
-  { name: "สายไหม", unresolved: 8, pushedBack: 2, col: 0, row: 0 },
-  { name: "ดอนเมือง", unresolved: 12, pushedBack: 3, col: 1, row: 0 },
-  { name: "หลักสี่", unresolved: 6, pushedBack: 2, col: 2, row: 0 },
-  { name: "บางเขน", unresolved: 10, pushedBack: 3, col: 3, row: 0 },
-  { name: "คลองสามวา", unresolved: 7, pushedBack: 2, col: 4, row: 0 },
-  { name: "มีนบุรี", unresolved: 9, pushedBack: 3, col: 5, row: 0 },
-  // row 1
-  { name: "บางซื่อ", unresolved: 11, pushedBack: 4, col: 0, row: 1 },
-  { name: "จตุจักร", unresolved: 22, pushedBack: 8, col: 1, row: 1 },
-  { name: "ลาดพร้าว", unresolved: 14, pushedBack: 5, col: 2, row: 1 },
-  { name: "บึงกุ่ม", unresolved: 8, pushedBack: 3, col: 3, row: 1 },
-  { name: "คันนายาว", unresolved: 5, pushedBack: 2, col: 4, row: 1 },
-  { name: "หนองจอก", unresolved: 4, pushedBack: 1, col: 5, row: 1 },
-  // row 2
-  { name: "ดุสิต", unresolved: 13, pushedBack: 4, col: 0, row: 2 },
-  { name: "ห้วยขวาง", unresolved: 24, pushedBack: 10, col: 1, row: 2 },
-  { name: "วังทองหลาง", unresolved: 11, pushedBack: 3, col: 2, row: 2 },
-  { name: "บางกะปิ", unresolved: 9, pushedBack: 3, col: 3, row: 2 },
-  { name: "สะพานสูง", unresolved: 6, pushedBack: 2, col: 4, row: 2 },
-  { name: "ลาดกระบัง", unresolved: 8, pushedBack: 3, col: 5, row: 2 },
-  // row 3 (south)
-  { name: "ปทุมวัน", unresolved: 28, pushedBack: 14, col: 0, row: 3 },
-  { name: "บางรัก", unresolved: 21, pushedBack: 9, col: 1, row: 3 },
-  { name: "วัฒนา", unresolved: 26, pushedBack: 11, col: 2, row: 3 },
-  { name: "คลองเตย", unresolved: 18, pushedBack: 7, col: 3, row: 3 },
-  { name: "พระโขนง", unresolved: 12, pushedBack: 4, col: 4, row: 3 },
-  { name: "บางนา", unresolved: 10, pushedBack: 3, col: 5, row: 3 },
-];
 
-const CELL_W = 13;
-const CELL_H = 15;
-const GRID_X0 = 8;
-const GRID_Y0 = 6;
-
-const DISTRICTS = DISTRICT_GRID.map((d) => {
-  // deterministic per-cell jitter so borders look organic, not a perfect grid
-  const seed = (d.col * 7 + d.row * 13) % 11;
-  const jx = ((seed % 5) - 2) * 0.35;
-  const jy = (((seed * 3) % 5) - 2) * 0.35;
-  const x = GRID_X0 + d.col * CELL_W + jx;
-  const y = GRID_Y0 + d.row * CELL_H + jy;
-  const w = CELL_W;
-  const h = CELL_H;
-  // rectangle with slight corner perturbation
-  const t1 = ((seed * 2) % 5) * 0.2;
-  const t2 = ((seed * 5) % 5) * 0.2;
-  const path = `M ${x} ${y + t1} L ${x + w - t2} ${y} L ${x + w} ${y + h - t1} L ${x + t2} ${y + h} Z`;
-  return {
-    name: d.name,
-    unresolved: d.unresolved,
-    pushedBack: d.pushedBack,
-    cx: x + w / 2,
-    cy: y + h / 2,
-    path,
-  };
-});
-
-const DISTRICT_MAX = Math.max(...DISTRICTS.map((d) => d.unresolved + d.pushedBack));
 
 function priorityScore(h: Hotspot): number {
   return Math.round(
@@ -392,16 +329,8 @@ function PriorityMapPage() {
             </div>
 
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-border bg-[oklch(0.985_0.005_85)]">
-              <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 75" preserveAspectRatio="none">
-                {/* River backdrop */}
-                <path
-                  d="M -5 20 C 15 30, 25 10, 40 25 S 65 55, 80 45 S 95 70, 110 60"
-                  stroke="oklch(0.82 0.07 220)"
-                  strokeWidth="2"
-                  fill="none"
-                  opacity="0.4"
-                />
-                {/* District choropleth */}
+              <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 75" preserveAspectRatio="xMidYMid meet">
+                {/* District choropleth — real Bangkok geometry */}
                 {DISTRICTS.map((d) => {
                   const t = Math.min(1, (d.unresolved + d.pushedBack) / DISTRICT_MAX);
                   const L = 0.96 - t * 0.46;
@@ -413,10 +342,11 @@ function PriorityMapPage() {
                       key={d.name}
                       d={d.path}
                       fill={fill}
-                      stroke={isSel ? "oklch(0.2 0.05 25)" : "oklch(1 0 0)"}
-                      strokeWidth={isSel ? 0.7 : 0.35}
+                      stroke={isSel ? "oklch(0.2 0.05 25)" : "oklch(1 0 0 / 0.85)"}
+                      strokeWidth={isSel ? 1.4 : 0.6}
+                      strokeLinejoin="round"
                       vectorEffect="non-scaling-stroke"
-                      className="cursor-pointer"
+                      className="cursor-pointer transition-opacity hover:opacity-90"
                       onClick={() => {
                         const h = HOTSPOTS.find((x) => x.district === d.name);
                         if (h) setSelectedId(h.id);
@@ -426,54 +356,37 @@ function PriorityMapPage() {
                     </path>
                   );
                 })}
-                {/* Labels */}
-                {DISTRICTS.map((d) => {
-                  const t = Math.min(1, (d.unresolved + d.pushedBack) / DISTRICT_MAX);
-                  return (
-                    <text
-                      key={`l-${d.name}`}
-                      x={d.cx}
-                      y={d.cy}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      fontSize="2"
-                      fontWeight={600}
-                      fill={t > 0.55 ? "oklch(0.99 0 0)" : "oklch(0.3 0.02 25)"}
-                      style={{ pointerEvents: "none" }}
-                    >
-                      {d.name}
-                    </text>
-                  );
-                })}
+                {/* Labels — only show on the top-12 most-loaded districts to avoid clutter */}
+                {[...DISTRICTS]
+                  .sort((a, b) => (b.unresolved + b.pushedBack) - (a.unresolved + a.pushedBack))
+                  .slice(0, 12)
+                  .map((d) => {
+                    const t = Math.min(1, (d.unresolved + d.pushedBack) / DISTRICT_MAX);
+                    return (
+                      <text
+                        key={`l-${d.name}`}
+                        x={d.cx}
+                        y={d.cy}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        fontSize="1.6"
+                        fontWeight={700}
+                        fill={t > 0.55 ? "oklch(0.99 0 0)" : "oklch(0.25 0.02 25)"}
+                        style={{ pointerEvents: "none", paintOrder: "stroke" }}
+                        stroke={t > 0.55 ? "oklch(0.3 0.05 25 / 0.4)" : "oklch(1 0 0 / 0.7)"}
+                        strokeWidth="0.25"
+                      >
+                        {d.name}
+                      </text>
+                    );
+                  })}
               </svg>
 
-              {/* Markers */}
-              {filtered.map((h) => (
-                <button
-                  key={h.id}
-                  onClick={() => setSelectedId(h.id)}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 group"
-                  style={{ left: `${h.x}%`, top: `${h.y}%` }}
-                  aria-label={h.name}
-                >
-                  <span
-                    className={cn(
-                      "relative grid place-items-center h-6 w-6 rounded-full ring-2 ring-background shadow-md transition",
-                      STATUS_COLOR[h.status],
-                      selected.id === h.id && "scale-125",
-                    )}
-                  >
-                    <MapPin className="h-3 w-3 text-white" />
-                  </span>
-                  <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 mt-1 whitespace-nowrap rounded-md bg-foreground/90 px-1.5 py-0.5 text-[9px] font-medium text-background opacity-0 group-hover:opacity-100">
-                    {h.name}
-                  </span>
-                </button>
-              ))}
 
               <div className="absolute bottom-2 left-2 rounded-md bg-background/90 backdrop-blur px-2 py-1 text-[10px] font-semibold text-muted-foreground">
-                กรุงเทพมหานคร · 24 เขต · ความเข้มสีแดง = เคสค้าง + ถูกตีกลับ
+                กรุงเทพมหานคร · 50 เขต · ความเข้มสีแดง = เคสค้าง + ถูกตีกลับ
               </div>
+
 
               <div className="absolute bottom-2 right-2 flex items-center gap-1.5 rounded-md bg-background/90 backdrop-blur px-2 py-1 text-[9.5px] font-medium text-muted-foreground">
                 <span>น้อย</span>
