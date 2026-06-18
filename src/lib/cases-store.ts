@@ -135,6 +135,60 @@ export const casesStore = {
     pendingDraft = null;
     emit();
   },
+  getEscalation(id: string): EscalationState | undefined {
+    return ensureEsc(id);
+  },
+  simulateOverdue(id: string) {
+    const c = cases.find((x) => x.id === id);
+    const s = ensureEsc(id);
+    if (!c || !s) return;
+    // Push to next escalation level with full reasons
+    let next = escalateOnce(c, { ...s, overdue: true });
+    if (next.level < 2) next = escalateOnce(c, next);
+    escalations.set(id, next);
+    emit();
+  },
+  escalate(id: string, reason?: string) {
+    const c = cases.find((x) => x.id === id);
+    const s = ensureEsc(id);
+    if (!c || !s) return;
+    escalations.set(id, escalateOnce(c, s, reason));
+    emit();
+  },
+  requestCitizenReview(id: string) {
+    const s = ensureEsc(id);
+    if (!s) return;
+    escalations.set(
+      id,
+      appendAudit(s, {
+        actor: "ประชาชนผู้รายงาน",
+        action: "ประชาชนขอให้ตรวจสอบสถานะอีกครั้ง",
+        reason: "ไม่มีการอัปเดตตามระยะเวลาที่กำหนด",
+        level: s.level,
+      }),
+    );
+    emit();
+  },
+  transferUnit(id: string, toUnit: string, reason: string) {
+    const prev = cases.find((c) => c.id === id);
+    if (!prev) return;
+    cases = cases.map((c) =>
+      c.id === id ? { ...c, unit: toUnit, updatedAt: "เมื่อสักครู่" } : c,
+    );
+    const s = ensureEsc(id);
+    if (s) {
+      escalations.set(id, {
+        ...appendAudit(s, {
+          actor: prev.unit,
+          action: `เคสถูกส่งต่อไปยัง ${toUnit}`,
+          reason,
+          level: s.level,
+        }),
+        transferCount: s.transferCount + 1,
+      });
+    }
+    emit();
+  },
 };
 
 function stepForStatus(s: Status, fallback: number): number {
