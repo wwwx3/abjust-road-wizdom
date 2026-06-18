@@ -54,7 +54,7 @@ function AnalyticsPage() {
                 <Crown className="h-5 w-5" />
               </div>
               <div>
-                <div className="text-sm font-bold text-foreground">Dashboard ผู้บริหารเมือง</div>
+                <div className="text-sm font-bold text-foreground">ผู้บริหารเมือง</div>
                 <div className="text-[11px] text-muted-foreground">เปิดแผนที่จุดเสี่ยงและปัญหาซ้ำของกรุงเทพฯ · Priority Map</div>
               </div>
             </div>
