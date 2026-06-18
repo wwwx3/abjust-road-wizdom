@@ -339,7 +339,7 @@ function PriorityMapPage() {
                   const L = 0.96 - t * 0.46;
                   const C = 0.02 + t * 0.22;
                   const fill = `oklch(${L.toFixed(3)} ${C.toFixed(3)} 25)`;
-                  const isSel = selected.district === d.name;
+                  const isSel = selectedDistrict === d.name;
                   return (
                     <path
                       key={d.name}
@@ -351,6 +351,7 @@ function PriorityMapPage() {
                       vectorEffect="non-scaling-stroke"
                       className="cursor-pointer transition-opacity hover:opacity-90"
                       onClick={() => {
+                        setSelectedDistrict(d.name);
                         const h = HOTSPOTS.find((x) => x.district === d.name);
                         if (h) setSelectedId(h.id);
                       }}
