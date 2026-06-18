@@ -2,7 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { RiskBadge } from "@/components/badges";
 import { ANALYTICS, MOCK_CASES } from "@/lib/abjust-data";
-import { Layers, FileText, FolderKanban, Flame, TrendingUp, MapPin, Building2 } from "lucide-react";
+import { useAllEscalations } from "@/lib/cases-store";
+import { ESCALATION_LADDER } from "@/lib/escalation";
+import { Layers, FileText, FolderKanban, Flame, TrendingUp, MapPin, Building2, Crown, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/analytics")({
@@ -14,6 +16,18 @@ function AnalyticsPage() {
   const a = ANALYTICS;
   const maxCat = Math.max(...a.topCategories.map((c) => c.count));
   const totalStatus = a.statusBreakdown.reduce((s, x) => s + x.count, 0);
+  const esc = useAllEscalations();
+  const execStats = {
+    overdue: esc.filter((x) => x.state.overdue).length,
+    highRiskUnassigned: esc.filter((x) => x.case.riskLevel === "สูงมาก" && x.case.status === "รับเรื่องแล้ว").length,
+    avgAcceptHours: 4.2,
+    escalated: esc.filter((x) => x.state.level >= 2).length,
+    needExec: esc.filter((x) => x.state.level >= 4).length,
+    resolvedPct: Math.round(
+      (a.statusBreakdown.find((s) => s.status === "แก้ไขเสร็จสิ้น")!.count / totalStatus) * 100,
+    ),
+  };
+
 
   return (
     <AppShell
@@ -28,6 +42,37 @@ function AnalyticsPage() {
           <Kpi icon={<Layers className="h-5 w-5" />} tone="bg-success/10 text-success" label="รายงานที่ถูกรวม" value={a.mergedReports.toLocaleString()} delta={`${Math.round((a.mergedReports / a.totalReports) * 100)}% ของทั้งหมด`} />
           <Kpi icon={<Flame className="h-5 w-5" />} tone="bg-danger/10 text-danger" label="เคสความเสี่ยงสูงสุด" value={String(a.topRiskCases.length)} delta="ต้องดำเนินการด่วน" />
         </div>
+
+        {/* Executive Dashboard */}
+        <div className="card-elevated p-5 sm:p-6 bg-gradient-to-br from-background via-background to-brand/5">
+          <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-brand/15 text-[oklch(0.42_0.13_60)]">
+                <Crown className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-foreground">Dashboard ผู้บริหารเมือง</div>
+                <div className="text-[11px] text-muted-foreground">มองภาพ bottleneck ของกระบวนการ ไม่ใช่คะแนนเจ้าหน้าที่</div>
+              </div>
+            </div>
+            <Link to="/officer/escalation" className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline">
+              ดูบอร์ด Escalation & Audit <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+            <ExecStat label="เคสค้างเกินกำหนด" value={execStats.overdue} tone="text-danger" />
+            <ExecStat label="เคสความเสี่ยงสูงที่ยังไม่ถูกมอบหมาย" value={execStats.highRiskUnassigned} tone="text-danger" />
+            <ExecStat label="เวลาเฉลี่ยในการรับเคส" value={`${execStats.avgAcceptHours} ชม.`} tone="text-info" />
+            <ExecStat label="จำนวนเคสที่ต้อง Escalate" value={execStats.escalated} tone="text-[oklch(0.45_0.13_60)]" />
+            <ExecStat label="เคสที่ต้องการการตัดสินใจจากระดับบริหาร" value={execStats.needExec} tone="text-[oklch(0.4_0.15_295)]" />
+            <ExecStat label="สัดส่วนเคสที่แก้ไขแล้ว" value={`${execStats.resolvedPct}%`} tone="text-success" />
+          </div>
+          <div className="mt-3 text-[11px] text-muted-foreground">
+            ระดับการส่งต่อสูงสุดที่ระบบรับรู้: L{Math.max(1, ...esc.map((x) => x.state.level))} · {ESCALATION_LADDER[Math.max(0, ...esc.map((x) => x.state.level - 1))].label}
+          </div>
+        </div>
+
+
 
         <div className="grid lg:grid-cols-[1.4fr_1fr] gap-5">
           {/* Top categories */}
@@ -172,6 +217,15 @@ function Kpi({ icon, tone, label, value, delta }: { icon: React.ReactNode; tone:
       <div className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className="mt-0.5 text-3xl font-extrabold tracking-tight text-foreground">{value}</div>
       <div className="mt-1 text-[11px] text-muted-foreground">{delta}</div>
+    </div>
+  );
+}
+
+function ExecStat({ label, value, tone }: { label: string; value: number | string; tone: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-3">
+      <div className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground leading-snug">{label}</div>
+      <div className={cn("mt-1 text-2xl font-extrabold tabular-nums", tone)}>{value}</div>
     </div>
   );
 }

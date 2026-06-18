@@ -10,6 +10,7 @@ import {
   Search,
   Menu,
   X,
+  ShieldAlert,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useRole } from "@/lib/use-role";
@@ -42,6 +43,7 @@ const citizenNav = [
 
 const officerNav = [
   { to: "/officer" as const, label: "Dashboard เคส", icon: LayoutDashboard },
+  { to: "/officer/escalation" as const, label: "Escalation & Audit", icon: ShieldAlert },
   { to: "/analytics" as const, label: "ภาพรวม / Analytics", icon: BarChart3 },
   { to: "/about" as const, label: "เกี่ยวกับ Prototype", icon: Info },
 ];

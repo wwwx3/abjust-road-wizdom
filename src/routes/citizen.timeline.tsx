@@ -3,8 +3,9 @@ import { useState, useMemo, useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { RiskBadge, StatusBadge } from "@/components/badges";
 import { TIMELINE_STEPS } from "@/lib/abjust-data";
-import { useMyCases, casesStore } from "@/lib/cases-store";
-import { CheckCircle2, Circle, Layers, MessageSquare, Bell, Loader2, Inbox, Plus, MapPin, Radio } from "lucide-react";
+import { useMyCases, casesStore, useEscalation } from "@/lib/cases-store";
+import { citizenFriendlyStateText, timeRemainingLabel } from "@/lib/escalation";
+import { CheckCircle2, Circle, Layers, MessageSquare, Bell, Loader2, Inbox, Plus, MapPin, Radio, AlertCircle, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/citizen/timeline")({
@@ -120,6 +121,7 @@ function TimelinePage() {
             <div className="mt-4 rounded-2xl bg-muted/50 p-4 text-sm leading-relaxed text-foreground">
               {c.summary}
             </div>
+            <CitizenStatusPanel id={c.id} />
           </div>
 
           <div className="card-elevated p-5 sm:p-6">
@@ -195,5 +197,50 @@ function TimelinePage() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+function CitizenStatusPanel({ id }: { id: string }) {
+  const esc = useEscalation(id);
+  const [done, setDone] = useState(false);
+  if (!esc) return null;
+  const overdue = esc.overdue || esc.deadlineAt - Date.now() <= 0;
+  const friendly = citizenFriendlyStateText(esc);
+  const canRequest = overdue;
+  return (
+    <div className="mt-4 rounded-2xl border border-border bg-gradient-to-br from-background to-info/5 p-4">
+      <div className="flex items-start gap-3">
+        <div className={cn("grid h-9 w-9 place-items-center rounded-xl shrink-0", overdue ? "bg-warning/15 text-[oklch(0.42_0.13_60)]" : "bg-info/10 text-info")}>
+          {overdue ? <AlertCircle className="h-5 w-5" /> : <Loader2 className="h-5 w-5" />}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-semibold text-foreground">{friendly}</div>
+          <div className="text-[11.5px] text-muted-foreground mt-0.5">
+            {overdue
+              ? `เคสนี้ใช้เวลานานกว่าปกติ (${timeRemainingLabel(esc.deadlineAt - Date.now())})`
+              : "เคสยังอยู่ในระยะเวลามาตรฐาน"}
+          </div>
+        </div>
+      </div>
+      {canRequest && !done && (
+        <button
+          onClick={() => {
+            casesStore.requestCitizenReview(id);
+            setDone(true);
+          }}
+          className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 transition"
+        >
+          <RefreshCw className="h-3.5 w-3.5" /> ขอให้ตรวจสอบสถานะอีกครั้ง
+        </button>
+      )}
+      {done && (
+        <div className="mt-3 rounded-xl bg-success/10 border border-success/30 px-3 py-2 text-[12px] text-success font-semibold">
+          ✓ ส่งคำขอตรวจสอบสถานะแล้ว เจ้าหน้าที่จะเห็นในระบบ
+        </div>
+      )}
+      <div className="mt-2 text-[10.5px] text-muted-foreground">
+        สามารถขอตรวจสอบสถานะได้เมื่อเคสไม่มีการอัปเดตตามระยะเวลาที่กำหนด
+      </div>
+    </div>
   );
 }

@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RoleRouteImport } from './routes/role'
 import { Route as ReportRouteImport } from './routes/report'
+import { Route as PublicRouteImport } from './routes/public'
 import { Route as OfficerRouteImport } from './routes/officer'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReportResultRouteImport } from './routes/report.result'
 import { Route as ReportProcessingRouteImport } from './routes/report.processing'
+import { Route as OfficerEscalationRouteImport } from './routes/officer.escalation'
 import { Route as CitizenTimelineRouteImport } from './routes/citizen.timeline'
 import { Route as OfficerCaseIdRouteImport } from './routes/officer.case.$id'
 
@@ -28,6 +30,11 @@ const RoleRoute = RoleRouteImport.update({
 const ReportRoute = ReportRouteImport.update({
   id: '/report',
   path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicRoute = PublicRouteImport.update({
+  id: '/public',
+  path: '/public',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfficerRoute = OfficerRouteImport.update({
@@ -60,6 +67,11 @@ const ReportProcessingRoute = ReportProcessingRouteImport.update({
   path: '/processing',
   getParentRoute: () => ReportRoute,
 } as any)
+const OfficerEscalationRoute = OfficerEscalationRouteImport.update({
+  id: '/escalation',
+  path: '/escalation',
+  getParentRoute: () => OfficerRoute,
+} as any)
 const CitizenTimelineRoute = CitizenTimelineRouteImport.update({
   id: '/citizen/timeline',
   path: '/citizen/timeline',
@@ -76,9 +88,11 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/officer': typeof OfficerRouteWithChildren
+  '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
@@ -88,9 +102,11 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/officer': typeof OfficerRouteWithChildren
+  '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
@@ -101,9 +117,11 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/officer': typeof OfficerRouteWithChildren
+  '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
@@ -115,9 +133,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/officer'
+    | '/public'
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
     | '/officer/case/$id'
@@ -127,9 +147,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/officer'
+    | '/public'
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
     | '/officer/case/$id'
@@ -139,9 +161,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/officer'
+    | '/public'
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
     | '/officer/case/$id'
@@ -152,6 +176,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AnalyticsRoute: typeof AnalyticsRoute
   OfficerRoute: typeof OfficerRouteWithChildren
+  PublicRoute: typeof PublicRoute
   ReportRoute: typeof ReportRouteWithChildren
   RoleRoute: typeof RoleRoute
   CitizenTimelineRoute: typeof CitizenTimelineRoute
@@ -171,6 +196,13 @@ declare module '@tanstack/react-router' {
       path: '/report'
       fullPath: '/report'
       preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public': {
+      id: '/public'
+      path: '/public'
+      fullPath: '/public'
+      preLoaderRoute: typeof PublicRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/officer': {
@@ -215,6 +247,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportProcessingRouteImport
       parentRoute: typeof ReportRoute
     }
+    '/officer/escalation': {
+      id: '/officer/escalation'
+      path: '/escalation'
+      fullPath: '/officer/escalation'
+      preLoaderRoute: typeof OfficerEscalationRouteImport
+      parentRoute: typeof OfficerRoute
+    }
     '/citizen/timeline': {
       id: '/citizen/timeline'
       path: '/citizen/timeline'
@@ -233,10 +272,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface OfficerRouteChildren {
+  OfficerEscalationRoute: typeof OfficerEscalationRoute
   OfficerCaseIdRoute: typeof OfficerCaseIdRoute
 }
 
 const OfficerRouteChildren: OfficerRouteChildren = {
+  OfficerEscalationRoute: OfficerEscalationRoute,
   OfficerCaseIdRoute: OfficerCaseIdRoute,
 }
 
@@ -261,6 +302,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AnalyticsRoute: AnalyticsRoute,
   OfficerRoute: OfficerRouteWithChildren,
+  PublicRoute: PublicRoute,
   ReportRoute: ReportRouteWithChildren,
   RoleRoute: RoleRoute,
   CitizenTimelineRoute: CitizenTimelineRoute,

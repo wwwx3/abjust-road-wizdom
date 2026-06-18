@@ -19,6 +19,25 @@ function AboutPage() {
           </p>
         </Block>
 
+        <Block icon={<Sparkles className="h-5 w-5" />} tone="bg-brand/15 text-[oklch(0.42_0.13_60)]" title="Escalation Ladder & Audit Trail">
+          <p>
+            Road Wizdom ไม่ได้หยุดที่การแจ้งเตือน เพราะการแจ้งเตือนอาจถูกละเลยได้
+            ระบบจึงใช้ <strong>Escalation Ladder</strong> และ <strong>Audit Trail</strong>
+            เพื่อให้เคสที่ค้างเกินกำหนดถูกส่งต่อเป็นลำดับขั้นโดยอัตโนมัติ
+            และทำให้เห็นว่าเคสติดอยู่ที่ขั้นตอนไหน ต้องการการตัดสินใจจากระดับใด
+          </p>
+          <p>
+            ระบบนี้ไม่ได้ใช้แต้มลงโทษเจ้าหน้าที่ แต่ใช้ความโปร่งใสของกระบวนการ
+            เพื่อป้องกันไม่ให้เคสหายไปหรือถูกโยนความรับผิดชอบโดยไม่มีผู้รับงานต่อ
+          </p>
+          <p className="text-muted-foreground text-[13px]">
+            เทคโนโลยีไม่สามารถบังคับให้มนุษย์ลงมือทำได้โดยตรง
+            แต่สามารถทำให้การเพิกเฉยไม่หายไปจากระบบ
+            และทำให้ผู้บริหารเห็นจุดค้างของกระบวนการได้ชัดเจนขึ้น
+          </p>
+        </Block>
+
+
         <Block icon={<CheckCircle2 className="h-5 w-5" />} tone="bg-success/10 text-success" title="สิ่งที่ Prototype นี้ทำได้">
           <ul className="list-disc pl-5 space-y-1.5">
             <li>เลือกบทบาท (ประชาชน / เจ้าหน้าที่รัฐ) แบบไม่ต้องล็อกอินจริง</li>

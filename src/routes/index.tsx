@@ -58,6 +58,7 @@ function Home() {
             <Link to="/about" className="hover:text-foreground transition">เกี่ยวกับ</Link>
             <Link to="/officer" className="hover:text-foreground transition">ตัวอย่าง Dashboard</Link>
             <Link to="/analytics" className="hover:text-foreground transition">Analytics</Link>
+            <Link to="/public" className="hover:text-foreground transition">ภาพรวมสาธารณะ</Link>
           </nav>
           <Link
             to="/role"
@@ -80,12 +81,12 @@ function Home() {
                 <ShieldCheck className="h-3.5 w-3.5 text-success" />
                 Civic-tech prototype · Bangkok Hackathon
               </div>
-              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-[56px] font-extrabold tracking-tight text-foreground leading-[1.05]">
-                เปลี่ยนรายงานปัญหาจราจร
+              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-[52px] font-extrabold tracking-tight text-foreground leading-[1.1]">
+                จากรายงานของประชาชน
                 <br />
-                <span className="text-primary">ให้กลายเป็นเคส</span>
+                <span className="bg-gradient-to-r from-brand to-success bg-clip-text text-transparent">สู่การจัดการปัญหาจราจร</span>
                 <br />
-                ที่จัดลำดับและติดตามได้
+                ที่ไม่หายไปจากระบบ
               </h1>
               <p className="mt-5 max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed">
                 Abjust คือ <span className="font-semibold text-foreground">Traffic-Risk Intelligence Layer</span> ที่ช่วยสรุป จัดลำดับความเสี่ยง รวมรายงานซ้ำ และติดตามความคืบหน้าของปัญหาจราจรในกรุงเทพฯ

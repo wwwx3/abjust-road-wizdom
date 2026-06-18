@@ -3,7 +3,9 @@ import { AppShell } from "@/components/app-shell";
 import { RiskBadge, StatusBadge } from "@/components/badges";
 import { MiniMap } from "@/components/mini-map";
 import { STATUS_ORDER, TIMELINE_STEPS, type Status } from "@/lib/abjust-data";
-import { casesStore, useCase } from "@/lib/cases-store";
+import { casesStore, useCase, useEscalation } from "@/lib/cases-store";
+import { citizenFriendlyStateText } from "@/lib/escalation";
+import { EscalationLadder, AuditTrail } from "@/components/escalation-ladder";
 import { useRole } from "@/lib/use-role";
 import { useState } from "react";
 import {
@@ -31,6 +33,7 @@ function CaseDetail() {
   const { id } = Route.useParams();
   const router = useRouter();
   const c = useCase(id);
+  const escState = useEscalation(id);
   const [role] = useRole();
   const [notified, setNotified] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
@@ -229,6 +232,56 @@ function CaseDetail() {
                     ตัวอย่างข้อความที่ส่ง: "เคส {c.id} อัปเดตสถานะเป็น {status} — Abjust"
                   </div>
                 )}
+              </div>
+            )}
+
+
+            {/* Escalation Ladder */}
+            {escState && (
+              <div className="card-elevated p-5 sm:p-6">
+                <EscalationLadder state={escState} />
+                {!viewOnly && escState.level < 5 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      onClick={() => {
+                        casesStore.escalate(c.id);
+                        setFlash(`ส่งต่อเคสไปขั้นถัดไปแล้ว`);
+                        setTimeout(() => setFlash(null), 2000);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-warning/30 bg-warning/5 px-3 py-1.5 text-xs font-semibold text-[oklch(0.42_0.13_60)] hover:bg-warning/10 transition"
+                    >
+                      ส่งต่อไปขั้นถัดไป
+                    </button>
+                    <button
+                      onClick={() => {
+                        casesStore.transferUnit(c.id, "สำนักงานเขต", "ขอหน่วยงานร่วมเพื่อดำเนินการในพื้นที่");
+                        setFlash("บันทึกการขอหน่วยงานร่วมแล้ว");
+                        setTimeout(() => setFlash(null), 2000);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent transition"
+                    >
+                      ขอหน่วยงานร่วม
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Audit Trail — officer only */}
+            {!viewOnly && escState && (
+              <div className="card-elevated p-5 sm:p-6">
+                <AuditTrail state={escState} />
+              </div>
+            )}
+
+            {/* Citizen-friendly summary in view-only */}
+            {viewOnly && escState && (
+              <div className="card-elevated p-5 sm:p-6 bg-gradient-to-br from-background to-info/5">
+                <div className="text-sm font-bold text-foreground">สถานะโดยสรุป</div>
+                <div className="mt-2 text-sm text-foreground">{citizenFriendlyStateText(escState)}</div>
+                <div className="mt-1 text-[11.5px] text-muted-foreground">
+                  มุมมองนี้แสดงเฉพาะภาพรวม — ไม่เปิดเผยรายละเอียดภายในระหว่างหน่วยงาน
+                </div>
               </div>
             )}
 
