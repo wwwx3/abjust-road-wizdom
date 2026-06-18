@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
-import { Sparkles, CheckCircle2, AlertTriangle, Rocket, Calculator } from "lucide-react";
+import { Sparkles, CheckCircle2, AlertTriangle, Rocket, Calculator, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
   head: () => ({ meta: [{ title: "เกี่ยวกับ Prototype — Abjust" }] }),
