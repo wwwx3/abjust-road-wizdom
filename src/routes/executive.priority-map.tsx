@@ -165,6 +165,76 @@ const HOTSPOTS: Hotspot[] = [
   },
 ];
 
+// ---- Bangkok district choropleth (24 simplified counties) ----
+type District = {
+  name: string;
+  unresolved: number;
+  pushedBack: number;
+  col: number;
+  row: number;
+};
+
+const DISTRICT_GRID: District[] = [
+  // row 0 (north)
+  { name: "สายไหม", unresolved: 8, pushedBack: 2, col: 0, row: 0 },
+  { name: "ดอนเมือง", unresolved: 12, pushedBack: 3, col: 1, row: 0 },
+  { name: "หลักสี่", unresolved: 6, pushedBack: 2, col: 2, row: 0 },
+  { name: "บางเขน", unresolved: 10, pushedBack: 3, col: 3, row: 0 },
+  { name: "คลองสามวา", unresolved: 7, pushedBack: 2, col: 4, row: 0 },
+  { name: "มีนบุรี", unresolved: 9, pushedBack: 3, col: 5, row: 0 },
+  // row 1
+  { name: "บางซื่อ", unresolved: 11, pushedBack: 4, col: 0, row: 1 },
+  { name: "จตุจักร", unresolved: 22, pushedBack: 8, col: 1, row: 1 },
+  { name: "ลาดพร้าว", unresolved: 14, pushedBack: 5, col: 2, row: 1 },
+  { name: "บึงกุ่ม", unresolved: 8, pushedBack: 3, col: 3, row: 1 },
+  { name: "คันนายาว", unresolved: 5, pushedBack: 2, col: 4, row: 1 },
+  { name: "หนองจอก", unresolved: 4, pushedBack: 1, col: 5, row: 1 },
+  // row 2
+  { name: "ดุสิต", unresolved: 13, pushedBack: 4, col: 0, row: 2 },
+  { name: "ห้วยขวาง", unresolved: 24, pushedBack: 10, col: 1, row: 2 },
+  { name: "วังทองหลาง", unresolved: 11, pushedBack: 3, col: 2, row: 2 },
+  { name: "บางกะปิ", unresolved: 9, pushedBack: 3, col: 3, row: 2 },
+  { name: "สะพานสูง", unresolved: 6, pushedBack: 2, col: 4, row: 2 },
+  { name: "ลาดกระบัง", unresolved: 8, pushedBack: 3, col: 5, row: 2 },
+  // row 3 (south)
+  { name: "ปทุมวัน", unresolved: 28, pushedBack: 14, col: 0, row: 3 },
+  { name: "บางรัก", unresolved: 21, pushedBack: 9, col: 1, row: 3 },
+  { name: "วัฒนา", unresolved: 26, pushedBack: 11, col: 2, row: 3 },
+  { name: "คลองเตย", unresolved: 18, pushedBack: 7, col: 3, row: 3 },
+  { name: "พระโขนง", unresolved: 12, pushedBack: 4, col: 4, row: 3 },
+  { name: "บางนา", unresolved: 10, pushedBack: 3, col: 5, row: 3 },
+];
+
+const CELL_W = 13;
+const CELL_H = 15;
+const GRID_X0 = 8;
+const GRID_Y0 = 6;
+
+const DISTRICTS = DISTRICT_GRID.map((d) => {
+  // deterministic per-cell jitter so borders look organic, not a perfect grid
+  const seed = (d.col * 7 + d.row * 13) % 11;
+  const jx = ((seed % 5) - 2) * 0.35;
+  const jy = (((seed * 3) % 5) - 2) * 0.35;
+  const x = GRID_X0 + d.col * CELL_W + jx;
+  const y = GRID_Y0 + d.row * CELL_H + jy;
+  const w = CELL_W;
+  const h = CELL_H;
+  // rectangle with slight corner perturbation
+  const t1 = ((seed * 2) % 5) * 0.2;
+  const t2 = ((seed * 5) % 5) * 0.2;
+  const path = `M ${x} ${y + t1} L ${x + w - t2} ${y} L ${x + w} ${y + h - t1} L ${x + t2} ${y + h} Z`;
+  return {
+    name: d.name,
+    unresolved: d.unresolved,
+    pushedBack: d.pushedBack,
+    cx: x + w / 2,
+    cy: y + h / 2,
+    path,
+  };
+});
+
+const DISTRICT_MAX = Math.max(...DISTRICTS.map((d) => d.unresolved + d.pushedBack));
+
 function priorityScore(h: Hotspot): number {
   return Math.round(
     h.recurring * 1.6 +
@@ -316,56 +386,66 @@ function PriorityMapPage() {
           <div className="card-elevated p-4 sm:p-5">
             <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
               <div className="text-sm font-bold text-foreground">
-                แผนที่กรุงเทพมหานคร · {mode === "heatmap" ? "Heatmap ความเสี่ยง" : mode === "recurring" ? "จุดปัญหาซ้ำ" : "พื้นที่ควรติดตามเชิงนโยบาย"}
+                แผนที่กรุงเทพมหานคร · เคสค้าง + ถูกตีกลับ รายเขต
               </div>
               <Legend />
             </div>
 
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-[oklch(0.96_0.02_85)] via-[oklch(0.97_0.015_95)] to-[oklch(0.94_0.03_75)]">
-              {/* Faux river */}
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-border bg-[oklch(0.985_0.005_85)]">
               <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 75" preserveAspectRatio="none">
+                {/* River backdrop */}
                 <path
                   d="M -5 20 C 15 30, 25 10, 40 25 S 65 55, 80 45 S 95 70, 110 60"
-                  stroke="oklch(0.78 0.08 220)"
-                  strokeWidth="3"
+                  stroke="oklch(0.82 0.07 220)"
+                  strokeWidth="2"
                   fill="none"
-                  opacity="0.55"
+                  opacity="0.4"
                 />
-                {/* grid */}
-                {[...Array(8)].map((_, i) => (
-                  <line key={`v${i}`} x1={(i + 1) * 12.5} y1="0" x2={(i + 1) * 12.5} y2="75" stroke="oklch(0.85 0.02 85)" strokeWidth="0.15" />
-                ))}
-                {[...Array(6)].map((_, i) => (
-                  <line key={`h${i}`} x1="0" y1={(i + 1) * 12.5} x2="100" y2={(i + 1) * 12.5} stroke="oklch(0.85 0.02 85)" strokeWidth="0.15" />
-                ))}
-              </svg>
-
-              {/* Heatmap blobs */}
-              {mode !== "recurring" &&
-                filtered.map((h) => {
-                  const intensity = Math.min(1, (priorityScore(h) - 30) / 80);
-                  const color =
-                    intensity > 0.75
-                      ? "oklch(0.55 0.22 25 / 0.55)"
-                      : intensity > 0.5
-                        ? "oklch(0.68 0.2 45 / 0.45)"
-                        : intensity > 0.3
-                          ? "oklch(0.78 0.15 70 / 0.4)"
-                          : "oklch(0.88 0.12 90 / 0.35)";
+                {/* District choropleth */}
+                {DISTRICTS.map((d) => {
+                  const t = Math.min(1, (d.unresolved + d.pushedBack) / DISTRICT_MAX);
+                  const L = 0.96 - t * 0.46;
+                  const C = 0.02 + t * 0.22;
+                  const fill = `oklch(${L.toFixed(3)} ${C.toFixed(3)} 25)`;
+                  const isSel = selected.district === d.name;
                   return (
-                    <div
-                      key={`blob-${h.id}`}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl pointer-events-none"
-                      style={{
-                        left: `${h.x}%`,
-                        top: `${h.y}%`,
-                        width: `${80 + intensity * 100}px`,
-                        height: `${80 + intensity * 100}px`,
-                        background: color,
+                    <path
+                      key={d.name}
+                      d={d.path}
+                      fill={fill}
+                      stroke={isSel ? "oklch(0.2 0.05 25)" : "oklch(1 0 0)"}
+                      strokeWidth={isSel ? 0.7 : 0.35}
+                      vectorEffect="non-scaling-stroke"
+                      className="cursor-pointer"
+                      onClick={() => {
+                        const h = HOTSPOTS.find((x) => x.district === d.name);
+                        if (h) setSelectedId(h.id);
                       }}
-                    />
+                    >
+                      <title>{`${d.name} · ค้าง ${d.unresolved} · ตีกลับ ${d.pushedBack}`}</title>
+                    </path>
                   );
                 })}
+                {/* Labels */}
+                {DISTRICTS.map((d) => {
+                  const t = Math.min(1, (d.unresolved + d.pushedBack) / DISTRICT_MAX);
+                  return (
+                    <text
+                      key={`l-${d.name}`}
+                      x={d.cx}
+                      y={d.cy}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize="2"
+                      fontWeight={600}
+                      fill={t > 0.55 ? "oklch(0.99 0 0)" : "oklch(0.3 0.02 25)"}
+                      style={{ pointerEvents: "none" }}
+                    >
+                      {d.name}
+                    </text>
+                  );
+                })}
+              </svg>
 
               {/* Markers */}
               {filtered.map((h) => (
@@ -378,18 +458,12 @@ function PriorityMapPage() {
                 >
                   <span
                     className={cn(
-                      "absolute inset-0 -m-2 rounded-full opacity-40 animate-ping",
-                      STATUS_COLOR[h.status],
-                    )}
-                  />
-                  <span
-                    className={cn(
-                      "relative grid place-items-center h-7 w-7 rounded-full ring-2 ring-background shadow-md transition",
+                      "relative grid place-items-center h-6 w-6 rounded-full ring-2 ring-background shadow-md transition",
                       STATUS_COLOR[h.status],
                       selected.id === h.id && "scale-125",
                     )}
                   >
-                    <MapPin className="h-3.5 w-3.5 text-white" />
+                    <MapPin className="h-3 w-3 text-white" />
                   </span>
                   <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 mt-1 whitespace-nowrap rounded-md bg-foreground/90 px-1.5 py-0.5 text-[9px] font-medium text-background opacity-0 group-hover:opacity-100">
                     {h.name}
@@ -397,15 +471,25 @@ function PriorityMapPage() {
                 </button>
               ))}
 
-              {/* Compass / label */}
-              <div className="absolute bottom-2 left-2 rounded-md bg-background/85 backdrop-blur px-2 py-1 text-[10px] font-semibold text-muted-foreground">
-                กรุงเทพมหานคร · Mock spatial overlay
+              <div className="absolute bottom-2 left-2 rounded-md bg-background/90 backdrop-blur px-2 py-1 text-[10px] font-semibold text-muted-foreground">
+                กรุงเทพมหานคร · 24 เขต · ความเข้มสีแดง = เคสค้าง + ถูกตีกลับ
+              </div>
+
+              <div className="absolute bottom-2 right-2 flex items-center gap-1.5 rounded-md bg-background/90 backdrop-blur px-2 py-1 text-[9.5px] font-medium text-muted-foreground">
+                <span>น้อย</span>
+                <span
+                  className="h-2 w-20 rounded-sm"
+                  style={{
+                    background:
+                      "linear-gradient(to right, oklch(0.96 0.02 25), oklch(0.78 0.12 25), oklch(0.62 0.2 25), oklch(0.5 0.22 25))",
+                  }}
+                />
+                <span>มาก</span>
               </div>
             </div>
 
-            {/* Explanation */}
             <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-              Dashboard ผู้บริหารเมืองช่วยเปลี่ยนข้อมูลร้องเรียนที่กระจัดกระจายให้กลายเป็นภาพรวมเชิงพื้นที่ เพื่อให้ผู้บริหารเห็นว่าพื้นที่ใดมีปัญหาซ้ำ ความเสี่ยงสูง หรือกระทบประชาชนมาก และควรได้รับการติดตามเชิงโครงสร้างหรือการจัดลำดับความสำคัญก่อน
+              แผนที่ผ่าเขตการปกครองของกรุงเทพฯ ออกเป็น 24 เขต ความเข้มของสีแดงในแต่ละเขตสะท้อน <span className="font-semibold text-foreground">จำนวนเคสที่ยังไม่ได้รับการแก้ไข</span> รวมกับ <span className="font-semibold text-foreground">เคสที่ถูกหน่วยงานตีกลับหรือปฏิเสธ</span> เพื่อให้ผู้บริหารเห็นภาระคงค้างเชิงพื้นที่และจัดลำดับการติดตามเชิงโครงสร้าง
             </p>
           </div>
 
