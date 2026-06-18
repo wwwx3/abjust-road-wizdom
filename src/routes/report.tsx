@@ -16,18 +16,7 @@ import {
   Image as ImageIcon,
   Upload,
 } from "lucide-react";
-import {
-  generateDescription,
-  riskScore,
-  riskLevelOf,
-  priorityScore,
-  findDuplicate,
-  recommendUnit,
-  impactedFromUrgency,
-  slaHint,
-} from "@/lib/ai-pipeline";
-import { casesStore, nextCaseId } from "@/lib/cases-store";
-import type { Case } from "@/lib/abjust-data";
+import { casesStore } from "@/lib/cases-store";
 
 // silence unused legacy import warning (kept for backward-compat re-export)
 void _legacy;
@@ -37,12 +26,6 @@ export const Route = createFileRoute("/report")({
   component: ReportPage,
 });
 
-const urgencyLevels = [
-  { value: "low", label: "ไม่เร่งด่วน", desc: "พบเห็นทั่วไป", tone: "border-border bg-card" },
-  { value: "med", label: "เร่งด่วนปานกลาง", desc: "ควรดำเนินการเร็ว", tone: "border-info/40 bg-info/5" },
-  { value: "high", label: "เร่งด่วน", desc: "กระทบการเดินทาง", tone: "border-brand/40 bg-brand/10" },
-  { value: "critical", label: "เร่งด่วนมาก", desc: "เสี่ยงต่อชีวิต", tone: "border-danger/40 bg-danger/5" },
-];
 
 interface Attachment {
   id: string;
@@ -61,7 +44,6 @@ function ReportPage() {
   const [label, setLabel] = useState("");
   const [note, setNote] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [urgency, setUrgency] = useState("high");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -81,7 +63,6 @@ function ReportPage() {
     setLng(String(SAMPLE_REPORT.lng));
     setLabel(SAMPLE_REPORT.label);
     setNote(SAMPLE_REPORT.note);
-    setUrgency("critical");
     setError(null);
   };
 
@@ -151,59 +132,21 @@ function ReportPage() {
     }
     setSubmitting(true);
 
-    // --- AI pipeline (offline rule-based) ---
-    const impactedCount = impactedFromUrgency(urgency);
-    const openCases = casesStore
-      .getAll()
-      .filter((c) => c.status !== "แก้ไขเสร็จสิ้น")
-      .map((c) => ({ id: c.id, category: c.category, lat: c.location.lat, lng: c.location.lng }));
-    const dup = findDuplicate(openCases, { category, lat: latN, lng: lngN });
-
-    if (dup) {
-      casesStore.incrementMerged(dup.case.id);
-      setTimeout(() => router.navigate({ to: "/report/result" }), 400);
-      return;
-    }
-
-    const recurrence = casesStore
-      .getAll()
-      .filter((c) => c.category === category).length;
-    const risk = riskScore({ category, impactedCount, recurrenceCount: recurrence });
-    const level = riskLevelOf(risk);
-    const imageSeverity = attachments.length > 0 ? 60 : 25;
-    const _prio = priorityScore({
-      risk,
-      impactedCount,
-      reporterCount: 1,
-      ageHours: 0,
-      imageSeverity,
-    });
-    const summary = generateDescription({
+    // Hand off to live AI processing page — citizen no longer picks severity.
+    const imageSeverity = attachments.length === 0 ? 25 : Math.min(85, 45 + attachments.length * 10);
+    casesStore.setDraft({
       category,
       description: desc,
       lat: latN,
       lng: lngN,
       locationLabel: label,
+      note,
+      attachmentCount: attachments.length,
+      imageSeverity,
+      createdAt: Date.now(),
     });
-    const id = nextCaseId();
-    const newCase: Case = {
-      id,
-      category,
-      title: desc.split("\n")[0].slice(0, 70) || `รายงาน ${category}`,
-      summary: summary + ` · SLA: ${slaHint(level)}`,
-      riskScore: risk,
-      riskLevel: level,
-      status: "รับเรื่องแล้ว",
-      mergedReports: 1,
-      unit: recommendUnit(category),
-      district: label || "ไม่ระบุเขต",
-      location: { lat: latN, lng: lngN, label: label || "พิกัดที่ผู้แจ้งระบุ" },
-      updatedAt: "เมื่อสักครู่",
-      currentStep: 2,
-    };
-    casesStore.addCase(newCase);
 
-    setTimeout(() => router.navigate({ to: "/report/result" }), 400);
+    router.navigate({ to: "/report/processing" });
   };
 
   return (
@@ -336,20 +279,16 @@ function ReportPage() {
             </Field>
           </Section>
 
-          <Section title="D. ระดับความเร่งด่วน" subtitle="ระบบจะนำไปประกอบการคำนวณ Risk Score">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-              {urgencyLevels.map((u) => (
-                <button
-                  key={u.value}
-                  onClick={() => setUrgency(u.value)}
-                  className={`rounded-xl border-2 px-3 py-3 text-left transition ${
-                    urgency === u.value ? "border-primary ring-2 ring-primary/15" : u.tone
-                  }`}
-                >
-                  <div className="text-sm font-semibold text-foreground">{u.label}</div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5">{u.desc}</div>
-                </button>
-              ))}
+          <Section title="D. การประเมิน" subtitle="หลังกดส่ง AI จะประเมินความรุนแรงและความเร่งด่วนเองจากข้อมูลข้างต้น — คุณไม่ต้องเลือกระดับเอง">
+            <div className="rounded-xl border border-info/30 bg-info/5 px-4 py-3 text-xs text-info-foreground flex items-start gap-2">
+              <Sparkles className="h-4 w-4 text-info shrink-0 mt-0.5" />
+              <div>
+                <div className="font-semibold text-foreground">AI จะคำนวณให้อัตโนมัติ</div>
+                <div className="text-muted-foreground mt-0.5">
+                  base severity จากหมวดปัญหา · จำนวนผู้ได้รับผลกระทบ · ชั่วโมงเร่งด่วน · ความรุนแรงจากภาพ ·
+                  การพบเหตุซ้ำในจุดเดิม
+                </div>
+              </div>
             </div>
           </Section>
 
