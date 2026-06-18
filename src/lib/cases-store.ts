@@ -40,6 +40,22 @@ let pendingDraft: Draft | null = null;
 const escalations: Map<string, EscalationState> = new Map(
   cases.map((c) => [c.id, seedEscalation(c)]),
 );
+// Pre-escalate a couple of demo cases so the Escalation board is alive on load
+(() => {
+  const demoL2 = cases.find((c) => c.id === "ABJ-2410-0851"); // จอดบนทางเท้า, รับเรื่องแล้ว
+  if (demoL2) {
+    const s = escalations.get(demoL2.id);
+    if (s) escalations.set(demoL2.id, escalateOnce(demoL2, { ...s, overdue: true }));
+  }
+  const demoL3 = cases.find((c) => c.id === "ABJ-2410-0848"); // ขับย้อนศร
+  if (demoL3) {
+    const s0 = escalations.get(demoL3.id);
+    if (s0) {
+      const s1 = escalateOnce(demoL3, { ...s0, overdue: true });
+      escalations.set(demoL3.id, escalateOnce(demoL3, s1));
+    }
+  }
+})();
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
 
