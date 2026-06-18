@@ -30,8 +30,21 @@ function saveMine(s: Set<string>) {
 let cases: Case[] = [...MOCK_CASES];
 let mine: Set<string> = loadMine();
 let lastCreatedId: string | null = null;
+let pendingDraft: Draft | null = null;
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
+
+export interface Draft {
+  category: string;
+  description: string;
+  lat: number;
+  lng: number;
+  locationLabel: string;
+  note: string;
+  attachmentCount: number;
+  imageSeverity: number; // 0-100, heuristic from attachments
+  createdAt: number;
+}
 
 export const casesStore = {
   subscribe(l: () => void) {
