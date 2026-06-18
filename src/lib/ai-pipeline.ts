@@ -139,21 +139,55 @@ export function findDuplicate<T extends DuplicateCandidate>(
   return best;
 }
 
+// Wider search — surfaces nearby candidates for user verification, even when
+// they fall outside the strict auto-merge radius. Returns up to 5 sorted by
+// similarity (closer + same category = higher confidence).
+export interface SimilarCandidate<T> {
+  case: T;
+  distance: number;
+  sameCategory: boolean;
+  withinAutoRadius: boolean;
+  similarity: number; // 0-100
+}
+
+export function findSimilarCases<T extends DuplicateCandidate>(
+  openCases: T[],
+  opts: { category: string; lat: number; lng: number; radiusM?: number },
+): SimilarCandidate<T>[] {
+  const radius = opts.radiusM ?? 800;
+  return openCases
+    .map((c) => {
+      const distance = haversineM(opts.lat, opts.lng, c.lat, c.lng);
+      const sameCategory = c.category === opts.category;
+      const withinAutoRadius = distance < DUPLICATE_RADIUS_M;
+      const distScore = Math.max(0, 100 - (distance / radius) * 100);
+      const catBonus = sameCategory ? 30 : 0;
+      const similarity = Math.min(100, Math.round(distScore * 0.7 + catBonus));
+      return { case: c, distance, sameCategory, withinAutoRadius, similarity };
+    })
+    .filter((x) => x.distance <= radius)
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, 5);
+}
+
 // ---------- 5) Recommended unit ----------
 export function recommendUnit(category: string): string {
   return (CATEGORY_META[category] ?? CATEGORY_META["อื่น ๆ"]).defaultUnit;
 }
 
-// Map urgency selection from citizen UI to an "impactedCount" estimate
+// AI-inferred impacted-people count derived from category base severity
+// (replaces user-picked urgency — citizens no longer choose severity).
+export function impactedFromCategory(category: string): number {
+  const sev = (CATEGORY_META[category] ?? CATEGORY_META["อื่น ๆ"]).baseSeverity;
+  return Math.max(3, Math.round(sev * 0.6));
+}
+
+// Kept for backward compatibility with any legacy callers.
 export function impactedFromUrgency(u: string): number {
   switch (u) {
-    case "critical":
-      return 80;
-    case "high":
-      return 40;
-    case "med":
-      return 15;
-    default:
-      return 3;
+    case "critical": return 80;
+    case "high": return 40;
+    case "med": return 15;
+    default: return 3;
   }
 }
