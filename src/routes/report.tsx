@@ -44,7 +44,6 @@ function ReportPage() {
   const [label, setLabel] = useState("");
   const [note, setNote] = useState("");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
-  const [urgency, setUrgency] = useState("high");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
