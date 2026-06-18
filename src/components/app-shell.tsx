@@ -138,10 +138,14 @@ export function AppShell({ children, title, subtitle }: { children: ReactNode; t
               className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <button className="relative grid h-9 w-9 place-items-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to={role === "officer" ? "/officer" : "/citizen/timeline"}
+            className="relative grid h-9 w-9 place-items-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="การแจ้งเตือน"
+          >
             <Bell className="h-4 w-4" />
             <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-brand ring-2 ring-background" />
-          </button>
+          </Link>
           <div className="hidden sm:flex items-center gap-2.5 pl-2">
             <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-brand to-success text-primary-foreground text-sm font-bold">
               {role === "officer" ? "อ" : "ป"}
