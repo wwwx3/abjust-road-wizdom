@@ -60,11 +60,11 @@ export function AppShell({ children, title, subtitle }: { children: ReactNode; t
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-[260px] border-r border-sidebar-border bg-sidebar transition-transform lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-[260px] border-r border-sidebar-border bg-gradient-to-b from-[oklch(0.985_0.018_60)] via-sidebar to-[oklch(0.96_0.03_150/0.6)] backdrop-blur transition-transform lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
