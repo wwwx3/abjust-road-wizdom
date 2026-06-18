@@ -220,3 +220,18 @@ export function nextCaseId(): string {
   const n = 900 + Math.floor(Math.random() * 99);
   return `ABJ-2410-0${n}`;
 }
+
+export function useEscalation(id: string): EscalationState | undefined {
+  useCases(); // re-subscribe on emit
+  return casesStore.getEscalation(id);
+}
+
+export function useAllEscalations(): Array<{ case: Case; state: EscalationState }> {
+  const all = useCases();
+  return all
+    .map((c) => {
+      const s = casesStore.getEscalation(c.id);
+      return s ? { case: c, state: s } : null;
+    })
+    .filter((x): x is { case: Case; state: EscalationState } => x !== null);
+}
