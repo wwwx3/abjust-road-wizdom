@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { RiskBadge } from "@/components/badges";
+import { ScoringDialog } from "@/components/scoring-dialog";
 import { STATUS_ORDER, type Case, type Status } from "@/lib/abjust-data";
 import { casesStore, useCases } from "@/lib/cases-store";
 import { useRole } from "@/lib/use-role";
-import { Layers, MapPin, Clock, Plus, Filter, Flame, GripVertical, Lock } from "lucide-react";
+import { Layers, MapPin, Clock, Plus, Filter, Flame, GripVertical, Lock, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 
@@ -274,12 +275,32 @@ function CaseCard({
           {c.summary}
         </div>
 
-        <div className="mt-3 flex items-center justify-between">
+        <div className="mt-3 flex items-center justify-between gap-2">
           <RiskBadge level={c.riskLevel} score={c.riskScore} />
-          <div className="flex items-center gap-1 text-[10.5px] text-muted-foreground">
-            <Layers className="h-3 w-3" />
-            <span className="font-semibold text-foreground">{c.mergedReports}</span>
-            <span>รายงาน</span>
+          <div className="flex items-center gap-2">
+            <span
+              onClick={(e) => e.preventDefault()}
+              onMouseDown={(e) => e.stopPropagation()}
+              className="inline-flex"
+            >
+              <ScoringDialog
+                c={c}
+                trigger={
+                  <button
+                    type="button"
+                    aria-label="ดูที่มาของคะแนน AI"
+                    className="inline-flex items-center gap-1 rounded-md bg-info/10 px-1.5 py-0.5 text-[10px] font-semibold text-info hover:bg-info/20 transition"
+                  >
+                    <Info className="h-3 w-3" /> ที่มา
+                  </button>
+                }
+              />
+            </span>
+            <div className="flex items-center gap-1 text-[10.5px] text-muted-foreground">
+              <Layers className="h-3 w-3" />
+              <span className="font-semibold text-foreground">{c.mergedReports}</span>
+              <span>รายงาน</span>
+            </div>
           </div>
         </div>
 
