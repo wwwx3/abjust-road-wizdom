@@ -15,13 +15,14 @@ import {
 import { useState, type ReactNode } from "react";
 import { useRole } from "@/lib/use-role";
 import { cn } from "@/lib/utils";
-import logoUrl from "@/assets/abjust-logo.jpg";
+import logoAsset from "@/assets/abjust-logo.png.asset.json";
+const logoUrl = logoAsset.url;
 
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link to="/" className="flex items-center gap-2.5 group">
-      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand/25 via-background to-success/25 ring-1 ring-border/60 shadow-sm overflow-hidden">
-        <img src={logoUrl} alt="Abjust" className="h-9 w-9 object-contain" />
+      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white ring-1 ring-border/60 shadow-sm overflow-hidden">
+        <img src={logoUrl} alt="Abjust" className="h-10 w-10 object-cover rounded-full" />
       </div>
       {!compact && (
         <div className="leading-tight">
@@ -66,7 +67,7 @@ export function AppShell({ children, title, subtitle }: { children: ReactNode; t
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-[260px] border-r border-sidebar-border bg-gradient-to-b from-[oklch(0.985_0.018_60)] via-sidebar to-[oklch(0.96_0.03_150/0.6)] backdrop-blur transition-transform lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-[260px] border-r border-sidebar-border backdrop-blur-xl transition-transform lg:translate-x-0 bg-[linear-gradient(165deg,oklch(0.95_0.07_75/0.85)_0%,oklch(0.96_0.05_95/0.7)_45%,oklch(0.94_0.09_135/0.75)_100%)]",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
