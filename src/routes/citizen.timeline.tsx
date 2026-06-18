@@ -3,8 +3,9 @@ import { useState, useMemo, useEffect } from "react";
 import { AppShell } from "@/components/app-shell";
 import { RiskBadge, StatusBadge } from "@/components/badges";
 import { TIMELINE_STEPS } from "@/lib/abjust-data";
-import { useMyCases, casesStore } from "@/lib/cases-store";
-import { CheckCircle2, Circle, Layers, MessageSquare, Bell, Loader2, Inbox, Plus, MapPin, Radio } from "lucide-react";
+import { useMyCases, casesStore, useEscalation } from "@/lib/cases-store";
+import { citizenFriendlyStateText, timeRemainingLabel } from "@/lib/escalation";
+import { CheckCircle2, Circle, Layers, MessageSquare, Bell, Loader2, Inbox, Plus, MapPin, Radio, AlertCircle, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/citizen/timeline")({
