@@ -1,18 +1,36 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
-import { CATEGORIES, SAMPLE_REPORT } from "@/lib/abjust-data";
+import { CATEGORIES, SAMPLE_REPORT, riskLevelOf as _legacy } from "@/lib/abjust-data";
 import { MiniMap } from "@/components/mini-map";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Sparkles,
-  MapPin,
   Camera,
   Send,
   AlertTriangle,
   ChevronDown,
   Wand2,
   Crosshair,
+  X,
+  Video,
+  Image as ImageIcon,
+  Upload,
 } from "lucide-react";
+import {
+  generateDescription,
+  riskScore,
+  riskLevelOf,
+  priorityScore,
+  findDuplicate,
+  recommendUnit,
+  impactedFromUrgency,
+  slaHint,
+} from "@/lib/ai-pipeline";
+import { casesStore, nextCaseId } from "@/lib/cases-store";
+import type { Case } from "@/lib/abjust-data";
+
+// silence unused legacy import warning (kept for backward-compat re-export)
+void _legacy;
 
 export const Route = createFileRoute("/report")({
   head: () => ({ meta: [{ title: "แจ้งปัญหาจราจร — Abjust" }] }),
@@ -26,6 +44,14 @@ const urgencyLevels = [
   { value: "critical", label: "เร่งด่วนมาก", desc: "เสี่ยงต่อชีวิต", tone: "border-danger/40 bg-danger/5" },
 ];
 
+interface Attachment {
+  id: string;
+  name: string;
+  size: number;
+  kind: "image" | "video";
+  url: string;
+}
+
 function ReportPage() {
   const router = useRouter();
   const [category, setCategory] = useState("");
@@ -34,8 +60,19 @@ function ReportPage() {
   const [lng, setLng] = useState("");
   const [label, setLabel] = useState("");
   const [note, setNote] = useState("");
-  const [photo, setPhoto] = useState(false);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [urgency, setUrgency] = useState("high");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Revoke object URLs on unmount
+  useEffect(() => {
+    return () => {
+      attachments.forEach((a) => URL.revokeObjectURL(a.url));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const useSample = () => {
     setCategory(SAMPLE_REPORT.category);
@@ -44,18 +81,129 @@ function ReportPage() {
     setLng(String(SAMPLE_REPORT.lng));
     setLabel(SAMPLE_REPORT.label);
     setNote(SAMPLE_REPORT.note);
-    setPhoto(true);
     setUrgency("critical");
+    setError(null);
   };
 
   const useCurrent = () => {
-    setLat("13.7563");
-    setLng("100.5018");
-    setLabel("ตำแหน่งปัจจุบัน · กรุงเทพฯ");
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setLat(pos.coords.latitude.toFixed(5));
+          setLng(pos.coords.longitude.toFixed(5));
+          setLabel("ตำแหน่งปัจจุบันของคุณ");
+        },
+        () => {
+          setLat("13.7563");
+          setLng("100.5018");
+          setLabel("ตำแหน่งปัจจุบัน · กรุงเทพฯ (จำลอง)");
+        },
+        { timeout: 5000 },
+      );
+    } else {
+      setLat("13.7563");
+      setLng("100.5018");
+      setLabel("ตำแหน่งปัจจุบัน · กรุงเทพฯ (จำลอง)");
+    }
+  };
+
+  const onFiles = (files: FileList | null) => {
+    if (!files) return;
+    const limit = 10 * 1024 * 1024;
+    const added: Attachment[] = [];
+    Array.from(files).forEach((f) => {
+      if (f.size > limit * 5) return; // 50 MB hard cap for video demo
+      const kind: "image" | "video" = f.type.startsWith("video/") ? "video" : "image";
+      added.push({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        name: f.name,
+        size: f.size,
+        kind,
+        url: URL.createObjectURL(f),
+      });
+    });
+    setAttachments((prev) => [...prev, ...added]);
+  };
+
+  const removeAttachment = (id: string) => {
+    setAttachments((prev) => {
+      const target = prev.find((a) => a.id === id);
+      if (target) URL.revokeObjectURL(target.url);
+      return prev.filter((a) => a.id !== id);
+    });
   };
 
   const submit = () => {
-    router.navigate({ to: "/report/result" });
+    setError(null);
+    if (!category) {
+      setError("กรุณาเลือกประเภทปัญหา");
+      return;
+    }
+    if (!desc.trim()) {
+      setError("กรุณากรอกรายละเอียดเหตุการณ์");
+      return;
+    }
+    const latN = parseFloat(lat);
+    const lngN = parseFloat(lng);
+    if (Number.isNaN(latN) || Number.isNaN(lngN)) {
+      setError("กรุณาระบุพิกัด (ใช้ปุ่ม 'ใช้ตำแหน่งปัจจุบัน' ได้)");
+      return;
+    }
+    setSubmitting(true);
+
+    // --- AI pipeline (offline rule-based) ---
+    const impactedCount = impactedFromUrgency(urgency);
+    const openCases = casesStore
+      .getAll()
+      .filter((c) => c.status !== "แก้ไขเสร็จสิ้น")
+      .map((c) => ({ id: c.id, category: c.category, lat: c.location.lat, lng: c.location.lng }));
+    const dup = findDuplicate(openCases, { category, lat: latN, lng: lngN });
+
+    if (dup) {
+      casesStore.incrementMerged(dup.case.id);
+      setTimeout(() => router.navigate({ to: "/report/result" }), 400);
+      return;
+    }
+
+    const recurrence = casesStore
+      .getAll()
+      .filter((c) => c.category === category).length;
+    const risk = riskScore({ category, impactedCount, recurrenceCount: recurrence });
+    const level = riskLevelOf(risk);
+    const imageSeverity = attachments.length > 0 ? 60 : 25;
+    const _prio = priorityScore({
+      risk,
+      impactedCount,
+      reporterCount: 1,
+      ageHours: 0,
+      imageSeverity,
+    });
+    const summary = generateDescription({
+      category,
+      description: desc,
+      lat: latN,
+      lng: lngN,
+      locationLabel: label,
+    });
+    const id = nextCaseId();
+    const newCase: Case = {
+      id,
+      category,
+      title: desc.split("\n")[0].slice(0, 70) || `รายงาน ${category}`,
+      summary: summary + ` · SLA: ${slaHint(level)}`,
+      riskScore: risk,
+      riskLevel: level,
+      status: "รับเรื่องแล้ว",
+      mergedReports: 1,
+      unit: recommendUnit(category),
+      district: label || "ไม่ระบุเขต",
+      location: { lat: latN, lng: lngN, label: label || "พิกัดที่ผู้แจ้งระบุ" },
+      updatedAt: "เมื่อสักครู่",
+      currentStep: 2,
+    };
+    casesStore.addCase(newCase);
+
+    setTimeout(() => router.navigate({ to: "/report/result" }), 400);
   };
 
   return (
@@ -125,23 +273,64 @@ function ReportPage() {
             </div>
           </Section>
 
-          <Section title="C. หลักฐาน" subtitle="แนบภาพถ่ายและบันทึกเพิ่มเติม (ไม่บังคับ)">
+          <Section title="C. หลักฐาน (ภาพถ่าย / วิดีโอ)" subtitle="แนบหลักฐานเพื่อให้ AI ประเมินความรุนแรงจากภาพได้แม่นยำขึ้น">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,video/*"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                onFiles(e.target.files);
+                e.target.value = "";
+              }}
+            />
             <button
-              onClick={() => setPhoto((p) => !p)}
-              className={`flex w-full items-center gap-4 rounded-xl border-2 border-dashed px-4 py-5 transition ${
-                photo ? "border-success/40 bg-success/5" : "border-border bg-muted/40 hover:bg-muted"
-              }`}
+              onClick={() => fileInputRef.current?.click()}
+              className="flex w-full items-center gap-4 rounded-xl border-2 border-dashed border-border bg-muted/40 hover:bg-muted px-4 py-5 transition"
             >
-              <div className={`grid h-12 w-12 place-items-center rounded-xl ${photo ? "bg-success/15 text-success" : "bg-card text-muted-foreground"}`}>
-                <Camera className="h-5 w-5" />
+              <div className="grid h-12 w-12 place-items-center rounded-xl bg-card text-muted-foreground">
+                <Upload className="h-5 w-5" />
               </div>
               <div className="text-left">
                 <div className="text-sm font-semibold text-foreground">
-                  {photo ? "แนบรูปภาพแล้ว · evidence_2410.jpg" : "แตะเพื่อแนบรูปภาพ"}
+                  แตะเพื่อแนบรูปภาพหรือวิดีโอ
                 </div>
-                <div className="text-xs text-muted-foreground">JPG, PNG · สูงสุด 10 MB</div>
+                <div className="text-xs text-muted-foreground">JPG, PNG, MP4, MOV · เลือกได้หลายไฟล์</div>
               </div>
             </button>
+
+            {attachments.length > 0 && (
+              <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {attachments.map((a) => (
+                  <div key={a.id} className="relative group rounded-xl overflow-hidden border border-border bg-muted aspect-video">
+                    {a.kind === "image" ? (
+                      <img src={a.url} alt={a.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <video src={a.url} className="h-full w-full object-cover" muted playsInline />
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 py-1 text-[10px] text-white truncate flex items-center gap-1">
+                      {a.kind === "video" ? <Video className="h-3 w-3" /> : <ImageIcon className="h-3 w-3" />}
+                      <span className="truncate">{a.name}</span>
+                    </div>
+                    <button
+                      onClick={() => removeAttachment(a.id)}
+                      aria-label="ลบไฟล์"
+                      className="absolute top-1.5 right-1.5 grid h-6 w-6 place-items-center rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {attachments.length > 0 && (
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2.5 py-1 text-[11px] font-semibold text-success">
+                <Camera className="h-3 w-3" /> แนบแล้ว {attachments.length} ไฟล์ · AI จะใช้ประเมิน image severity
+              </div>
+            )}
+
             <Field label="บันทึกเพิ่มเติม (optional)" className="mt-3">
               <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="เช่น พบบ่อยช่วงเวลาเร่งด่วน" className="w-full rounded-xl border border-input bg-card px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring/40" />
             </Field>
@@ -164,6 +353,12 @@ function ReportPage() {
             </div>
           </Section>
 
+          {error && (
+            <div className="rounded-xl border border-danger/30 bg-danger/5 px-3 py-2 text-xs font-semibold text-danger">
+              {error}
+            </div>
+          )}
+
           <div className="card-elevated p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
             <div className="flex items-start gap-3">
               <div className="grid h-10 w-10 place-items-center rounded-xl bg-info/10 text-info shrink-0">
@@ -171,14 +366,15 @@ function ReportPage() {
               </div>
               <div className="text-sm">
                 <div className="font-semibold text-foreground">พร้อมส่งเข้าระบบประเมินความเสี่ยง</div>
-                <div className="text-xs text-muted-foreground">AI จะสรุปและให้ Risk Score ภายในไม่กี่วินาที</div>
+                <div className="text-xs text-muted-foreground">AI จะสรุป จัดลำดับ และตรวจหารายงานซ้ำภายในไม่กี่วินาที</div>
               </div>
             </div>
             <button
               onClick={submit}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 transition w-full sm:w-auto justify-center"
+              disabled={submitting}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 transition w-full sm:w-auto justify-center disabled:opacity-60"
             >
-              <Send className="h-4 w-4" /> ส่งรายงาน
+              <Send className="h-4 w-4" /> {submitting ? "กำลังประมวลผล…" : "ส่งรายงาน"}
             </button>
           </div>
 
