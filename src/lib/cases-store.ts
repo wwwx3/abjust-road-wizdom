@@ -91,6 +91,15 @@ export const casesStore = {
   getLastCreatedId: () => lastCreatedId,
   getMineIds: () => [...mine],
   isMine: (id: string) => mine.has(id),
+  setDraft(d: Draft | null) {
+    pendingDraft = d;
+    emit();
+  },
+  getDraft: () => pendingDraft,
+  clearDraft() {
+    pendingDraft = null;
+    emit();
+  },
 };
 
 function stepForStatus(s: Status, fallback: number): number {
