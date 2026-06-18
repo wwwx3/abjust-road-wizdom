@@ -91,11 +91,8 @@ function Home() {
               </p>
 
               <div className="mt-7 flex flex-wrap gap-3">
-                <Link to="/report" className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 transition">
-                  เริ่มแจ้งปัญหา <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link to="/role" className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent transition">
-                  เลือกบทบาท
+                <Link to="/role" className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 transition">
+                  เลือกบทบาท <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link to="/officer" className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-5 py-3 text-sm font-semibold text-foreground hover:bg-accent transition">
                   ดู Dashboard ตัวอย่าง
