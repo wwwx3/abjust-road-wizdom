@@ -380,7 +380,7 @@ function ReportPage() {
 
           <div className="flex items-start gap-2 rounded-xl bg-accent/60 px-3 py-2 text-xs text-accent-foreground">
             <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            <span>Prototype นี้ไม่ได้ส่งข้อมูลจริงไปยัง Traffy Fondue/BMA — ใช้สำหรับการสาธิตเท่านั้น</span>
+            <span>Prototype นี้เป็นการสาธิตเท่านั้น ข้อมูลจะถูกประมวลผลในเครื่องและไม่ถูกส่งไปยังหน่วยงานจริง</span>
           </div>
         </div>
       </div>
