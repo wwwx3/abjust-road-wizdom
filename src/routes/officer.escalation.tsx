@@ -248,15 +248,14 @@ function EscalationPage() {
 
 function DemoSimulatorCard({
   running,
-  disabled,
   onRun,
   onReset,
 }: {
   running: boolean;
-  disabled: boolean;
   onRun: () => void;
   onReset: () => void;
 }) {
+
   return (
     <div className="card-elevated p-5 sm:p-6 bg-gradient-to-br from-[oklch(0.98_0.03_60)] to-[oklch(0.97_0.04_150)]">
       <div className="flex flex-wrap items-start justify-between gap-4">
