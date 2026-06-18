@@ -3,7 +3,9 @@ import { AppShell } from "@/components/app-shell";
 import { RiskBadge, StatusBadge } from "@/components/badges";
 import { MiniMap } from "@/components/mini-map";
 import { STATUS_ORDER, TIMELINE_STEPS, type Status } from "@/lib/abjust-data";
-import { casesStore, useCase } from "@/lib/cases-store";
+import { casesStore, useCase, useEscalation } from "@/lib/cases-store";
+import { citizenFriendlyStateText } from "@/lib/escalation";
+import { EscalationLadder, AuditTrail } from "@/components/escalation-ladder";
 import { useRole } from "@/lib/use-role";
 import { useState } from "react";
 import {

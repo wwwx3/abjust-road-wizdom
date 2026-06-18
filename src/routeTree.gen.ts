@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RoleRouteImport } from './routes/role'
 import { Route as ReportRouteImport } from './routes/report'
+import { Route as PublicRouteImport } from './routes/public'
 import { Route as OfficerRouteImport } from './routes/officer'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AboutRouteImport } from './routes/about'
@@ -29,6 +30,11 @@ const RoleRoute = RoleRouteImport.update({
 const ReportRoute = ReportRouteImport.update({
   id: '/report',
   path: '/report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicRoute = PublicRouteImport.update({
+  id: '/public',
+  path: '/public',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfficerRoute = OfficerRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/officer': typeof OfficerRouteWithChildren
+  '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/officer': typeof OfficerRouteWithChildren
+  '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
   '/officer': typeof OfficerRouteWithChildren
+  '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/officer'
+    | '/public'
     | '/report'
     | '/role'
     | '/citizen/timeline'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/officer'
+    | '/public'
     | '/report'
     | '/role'
     | '/citizen/timeline'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/analytics'
     | '/officer'
+    | '/public'
     | '/report'
     | '/role'
     | '/citizen/timeline'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AnalyticsRoute: typeof AnalyticsRoute
   OfficerRoute: typeof OfficerRouteWithChildren
+  PublicRoute: typeof PublicRoute
   ReportRoute: typeof ReportRouteWithChildren
   RoleRoute: typeof RoleRoute
   CitizenTimelineRoute: typeof CitizenTimelineRoute
@@ -183,6 +196,13 @@ declare module '@tanstack/react-router' {
       path: '/report'
       fullPath: '/report'
       preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public': {
+      id: '/public'
+      path: '/public'
+      fullPath: '/public'
+      preLoaderRoute: typeof PublicRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/officer': {
@@ -282,6 +302,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AnalyticsRoute: AnalyticsRoute,
   OfficerRoute: OfficerRouteWithChildren,
+  PublicRoute: PublicRoute,
   ReportRoute: ReportRouteWithChildren,
   RoleRoute: RoleRoute,
   CitizenTimelineRoute: CitizenTimelineRoute,
