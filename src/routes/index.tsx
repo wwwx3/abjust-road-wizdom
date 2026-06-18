@@ -109,8 +109,7 @@ function Home() {
               </div>
 
               <div className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-medium text-foreground">Traffy Fondue</span> คือ Reporting backbone ·
-                <span className="font-medium text-foreground">Abjust</span> คือ Risk Intelligence Layer
+                <span className="font-medium text-foreground">Abjust</span> คือ Risk Intelligence Layer สำหรับรายงานปัญหาจราจรในกรุงเทพฯ
               </div>
             </div>
 
@@ -184,7 +183,7 @@ function Home() {
       <footer className="border-t border-border py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
           <div>© 2026 Abjust · Bangkok Hackathon Prototype</div>
-          <div>Traffy Fondue = Reporting backbone · Abjust = Risk Intelligence Layer</div>
+          <div>Abjust = Risk Intelligence Layer สำหรับรายงานปัญหาจราจรในกรุงเทพฯ</div>
         </div>
       </footer>
     </div>

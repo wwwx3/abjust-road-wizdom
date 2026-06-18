@@ -14,7 +14,6 @@ function AboutPage() {
         <Block icon={<Sparkles className="h-5 w-5" />} tone="bg-info/10 text-info" title="โปรเจกต์นี้คืออะไร">
           <p>
             <strong>Abjust</strong> คือ Traffic-Risk Intelligence Layer สำหรับการจัดการรายงานปัญหาจราจรในกรุงเทพฯ
-            จุดยืน: <em>Traffy Fondue เป็น Reporting backbone, Abjust เป็น Risk Intelligence Layer</em>
             ที่ช่วยสรุปรายงาน จัดลำดับความเสี่ยง รวมรายงานซ้ำ สนับสนุนเวิร์กโฟลว์ของเจ้าหน้าที่
             และให้ประชาชนติดตามความคืบหน้าได้ชัดเจน
           </p>
@@ -37,7 +36,7 @@ function AboutPage() {
           <ul className="list-disc pl-5 space-y-1.5">
             <li>เป็น prototype ที่พัฒนาในเวลา 2 วันสำหรับงาน hackathon</li>
             <li>ใช้ข้อมูลจำลอง (mock data) และ rule-based AI fallback เท่านั้น</li>
-            <li>ยังไม่ได้เชื่อมต่อกับระบบจริงของ Traffy Fondue หรือ BMA</li>
+            <li>ยังไม่ได้เชื่อมต่อกับระบบจริงของ BMA</li>
             <li>ไม่ได้แทนที่ระบบเดิม แต่เป็น intelligence layer เสริม</li>
             <li>ไม่มีระบบยืนยันตัวตน, ไม่มีการประมวลผลภาพจริง, ไม่มีการเบลอใบหน้าอัตโนมัติ</li>
           </ul>
