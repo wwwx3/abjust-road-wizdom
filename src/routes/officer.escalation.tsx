@@ -289,7 +289,7 @@ function DemoSimulatorCard({
           </button>
           <button
             onClick={onReset}
-            disabled={disabled || running}
+            disabled={running}
             className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground hover:bg-accent transition disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <RotateCcw className="h-3.5 w-3.5" /> รีเซ็ตเคส
