@@ -26,12 +26,6 @@ export const Route = createFileRoute("/report")({
   component: ReportPage,
 });
 
-const urgencyLevels = [
-  { value: "low", label: "ไม่เร่งด่วน", desc: "พบเห็นทั่วไป", tone: "border-border bg-card" },
-  { value: "med", label: "เร่งด่วนปานกลาง", desc: "ควรดำเนินการเร็ว", tone: "border-info/40 bg-info/5" },
-  { value: "high", label: "เร่งด่วน", desc: "กระทบการเดินทาง", tone: "border-brand/40 bg-brand/10" },
-  { value: "critical", label: "เร่งด่วนมาก", desc: "เสี่ยงต่อชีวิต", tone: "border-danger/40 bg-danger/5" },
-];
 
 interface Attachment {
   id: string;
