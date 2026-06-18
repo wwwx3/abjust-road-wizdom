@@ -240,82 +240,28 @@ function CaseDetail() {
             {escState && (
               <div className="card-elevated p-5 sm:p-6">
                 <EscalationLadder state={escState} />
-                {!viewOnly && (
-                  <div className="mt-4 space-y-2">
-                    {!escState.accepted && (
-                      <button
-                        onClick={() => {
-                          casesStore.acceptCase(c.id);
-                          setFlash("รับเคสเป็นหน่วยงานหลักแล้ว");
-                          setTimeout(() => setFlash(null), 2000);
-                        }}
-                        className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-success px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90 transition"
-                      >
-                        ✓ รับเคสเป็นหน่วยงานหลัก
-                      </button>
-                    )}
+                {!viewOnly && escState.level < 5 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       onClick={() => {
-                        const text =
-                          prompt(
-                            "ระบุขั้นตอนถัดไปที่จะดำเนินการ",
-                            "ประสานเจ้าหน้าที่ลงพื้นที่และแจ้งสำนักงานเขตร่วมตรวจสอบจุดกีดขวาง",
-                          ) ?? "";
-                        if (text.trim()) {
-                          casesStore.setNextAction(c.id, text.trim());
-                          setFlash("อัปเดตขั้นตอนถัดไปเรียบร้อย");
-                          setTimeout(() => setFlash(null), 2000);
-                        }
+                        casesStore.escalate(c.id);
+                        setFlash(`ส่งต่อเคสไปขั้นถัดไปแล้ว`);
+                        setTimeout(() => setFlash(null), 2000);
                       }}
-                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground hover:bg-accent transition"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-warning/30 bg-warning/5 px-3 py-1.5 text-xs font-semibold text-[oklch(0.42_0.13_60)] hover:bg-warning/10 transition"
                     >
-                      อัปเดตขั้นตอนถัดไป
+                      ส่งต่อไปขั้นถัดไป
                     </button>
-                    <div className="flex flex-wrap gap-2">
-                      {escState.level < 5 && (
-                        <button
-                          onClick={() => {
-                            casesStore.escalate(c.id);
-                            setFlash("ส่งต่อเคสไปขั้นถัดไปแล้ว");
-                            setTimeout(() => setFlash(null), 2000);
-                          }}
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-warning/30 bg-warning/5 px-3 py-1.5 text-xs font-semibold text-[oklch(0.42_0.13_60)] hover:bg-warning/10 transition"
-                        >
-                          ส่งต่อขั้นถัดไป
-                        </button>
-                      )}
-                      <button
-                        onClick={() => {
-                          casesStore.requestSupporting(
-                            c.id,
-                            "สำนักงานเขต",
-                            "ขอหน่วยงานร่วมเพื่อตรวจสอบจุดกีดขวาง",
-                          );
-                          setFlash("ขอหน่วยงานร่วมแล้ว");
-                          setTimeout(() => setFlash(null), 2000);
-                        }}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent transition"
-                      >
-                        ขอหน่วยงานร่วม
-                      </button>
-                      <button
-                        onClick={() => {
-                          const to =
-                            prompt("ระบุชื่อหน่วยงานที่จะส่งต่อ", "สำนักงานเขต") ?? "";
-                          const reason = to
-                            ? prompt("ระบุเหตุผลการส่งต่อ", "นอกขอบเขตอำนาจหน่วยงานปัจจุบัน") ?? ""
-                            : "";
-                          if (to.trim() && reason.trim()) {
-                            casesStore.transferUnit(c.id, to.trim(), reason.trim());
-                            setFlash(`ส่งต่อไปยัง ${to.trim()} แล้ว`);
-                            setTimeout(() => setFlash(null), 2000);
-                          }
-                        }}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent transition"
-                      >
-                        ส่งต่อพร้อมเหตุผล
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => {
+                        casesStore.transferUnit(c.id, "สำนักงานเขต", "ขอหน่วยงานร่วมเพื่อดำเนินการในพื้นที่");
+                        setFlash("บันทึกการขอหน่วยงานร่วมแล้ว");
+                        setTimeout(() => setFlash(null), 2000);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent transition"
+                    >
+                      ขอหน่วยงานร่วม
+                    </button>
                   </div>
                 )}
               </div>

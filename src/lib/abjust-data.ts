@@ -74,25 +74,7 @@ export const SAMPLE_REPORT = {
   note: "พบช่วงเช้าและบ่ายเป็นประจำ",
 };
 
-export const DEMO_ESCALATION_CASE_ID = "RW-EMG-092";
-
 export const MOCK_CASES: Case[] = [
-  {
-    id: DEMO_ESCALATION_CASE_ID,
-    category: "กีดขวางทางรถฉุกเฉิน",
-    title: "รถจอดกีดขวางทางเข้ารถพยาบาลใกล้โรงพยาบาลจุฬาลงกรณ์",
-    summary:
-      "มีรายงานหลายครั้งว่ารถจอดกีดขวางทางเข้ารถพยาบาลบริเวณใกล้โรงพยาบาลจุฬาลงกรณ์ อาจส่งผลให้รถฉุกเฉินเข้าถึงพื้นที่ล่าช้าและเพิ่มความเสี่ยงต่อความปลอดภัยของประชาชน",
-    riskScore: 92,
-    riskLevel: "สูงมาก",
-    status: "รับเรื่องแล้ว",
-    mergedReports: 18,
-    unit: "หน่วยบังคับใช้กฎหมายจราจร",
-    district: "ปทุมวัน",
-    location: { lat: 13.7311, lng: 100.5347, label: "ถ.พระราม 4 ใกล้ รพ.จุฬาลงกรณ์" },
-    updatedAt: "เมื่อสักครู่",
-    currentStep: 0,
-  },
   {
     id: "ABJ-2410-0871",
     category: "กีดขวางทางรถฉุกเฉิน",
@@ -103,7 +85,7 @@ export const MOCK_CASES: Case[] = [
     riskLevel: "สูงมาก",
     status: "กำลังตรวจสอบ",
     mergedReports: 18,
-    unit: "หน่วยบังคับใช้กฎหมายจราจร",
+    unit: "Traffic Enforcement Unit",
     district: "ปทุมวัน",
     location: { lat: 13.7311, lng: 100.5347, label: "ถ.พระราม 4 ใกล้ รพ.จุฬาฯ" },
     updatedAt: "5 นาทีที่แล้ว",
