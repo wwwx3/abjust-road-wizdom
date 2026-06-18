@@ -58,6 +58,7 @@ function Home() {
             <Link to="/about" className="hover:text-foreground transition">เกี่ยวกับ</Link>
             <Link to="/officer" className="hover:text-foreground transition">ตัวอย่าง Dashboard</Link>
             <Link to="/analytics" className="hover:text-foreground transition">Analytics</Link>
+            <Link to="/public" className="hover:text-foreground transition">ภาพรวมสาธารณะ</Link>
           </nav>
           <Link
             to="/role"
