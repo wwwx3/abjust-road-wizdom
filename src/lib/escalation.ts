@@ -234,7 +234,26 @@ export function timeRemainingLabel(ms: number): string {
 }
 
 export function citizenFriendlyStateText(state: EscalationState): string {
-  if (state.level === 1 && !state.overdue) return "เคสอยู่กับหน่วยงานที่เกี่ยวข้อง";
-  if (state.level >= 2) return "อยู่ระหว่างการประสานงานเพิ่มเติม";
-  return "เคสอยู่กับหน่วยงานที่เกี่ยวข้อง";
+  if (state.level === 1 && state.accepted) return "หน่วยงานรับเคสและกำลังดำเนินการ";
+  if (state.level === 1 && !state.accepted) return "อยู่ระหว่างมอบหมายหน่วยงานที่เกี่ยวข้อง";
+  return "อยู่ระหว่างการประสานงานเพิ่มเติม";
 }
+
+export function nextActionByLevel(state: EscalationState): string {
+  if (state.level === 1 && !state.accepted)
+    return `หน่วยงานหลัก (${state.currentOwner}) ต้องกดรับเคส`;
+  if (state.level === 1) return state.nextAction;
+  if (state.level === 2)
+    return "ผู้ประสานงานกลางต้องระบุหน่วยงานหลัก/หน่วยงานร่วม และอัปเดตสถานะ";
+  if (state.level === 3)
+    return "หัวหน้าหน่วยงานต้องพิจารณาและสั่งการให้หน่วยงานหลักเริ่มดำเนินการ";
+  if (state.level === 4)
+    return "Dashboard ผู้บริหารเมือง — ต้องการการตัดสินใจระดับนโยบาย";
+  return "เคสปรากฏในภาพรวมสาธารณะแล้ว";
+}
+
+export function autoNextIfIgnored(state: EscalationState): string {
+  if (state.level >= 5) return "—";
+  return `หากไม่มีการอัปเดตภายในกำหนด ระบบจะส่งต่ออัตโนมัติไปยัง ${ESCALATION_LADDER[state.level].label}`;
+}
+
