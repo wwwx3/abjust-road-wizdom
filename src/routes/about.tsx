@@ -161,7 +161,162 @@ priority = 100×0.40 + 3×0.25 + 20×0.15 + 12.5×0.10 + 30×0.10
           </div>
         </Block>
 
+        <Block
+          icon={<RefreshCw className="h-5 w-5" />}
+          tone="bg-warning/10 text-[oklch(0.4_0.1_60)]"
+          title="การติดตามปัญหาซ้ำ: พื้นที่เสี่ยง &amp; พื้นที่ควรติดตามเชิงนโยบาย"
+        >
+          <p>
+            เมื่อเคสปิดไปแล้ว ระบบไม่ได้ลืมมัน แต่เก็บข้อมูลไว้เพื่อตรวจสอบว่า{" "}
+            <em>ปัญหาเดิมกลับมาอีกหรือไม่</em>{" "}
+            การเกิดซ้ำที่จุดเดิมเป็นสัญญาณสำคัญว่าแก้ไขยังไม่ถึงต้นตอ หรือมีช่องโหว่ในนโยบาย
+            ระบบจึงแบ่งพื้นที่ออกเป็น 2 ประเภทตามลักษณะการเกิดซ้ำ
+          </p>
 
+          {/* Recurrence detection */}
+          <div className="mt-3 rounded-lg border border-border bg-muted/40 p-4 space-y-2">
+            <h3 className="font-bold text-foreground">1) วิธีตรวจจับการเกิดซ้ำ (Recurrence Detection)</h3>
+            <p>
+              ระบบเปรียบเทียบรายงานใหม่กับเคสที่ <strong>ปิดแล้ว</strong> (status = แก้ไขเสร็จสิ้น)
+              หากพบความสอดคล้องทั้ง 3 เงื่อนไขนี้ จะถือว่าเป็นการเกิดซ้ำ
+            </p>
+            <ul className="list-disc pl-5 space-y-0.5">
+              <li>หมวดหมู่เดียวกัน (category)</li>
+              <li>ระยะห่างทางภูมิศาสตร์ ≤ 200 เมตร</li>
+              <li>เวลาห่างจากเคสก่อน ≤ 90 วัน</li>
+            </ul>
+            <pre className="overflow-x-auto rounded bg-background p-3 text-[12.5px] leading-relaxed">
+{`recurrenceFlag = (
+  categoryMatch
+  AND haversine(newLat, newLng, closedLat, closedLng) ≤ 200 m
+  AND daysSinceClosed ≤ 90
+)`}
+            </pre>
+            <p className="text-muted-foreground text-[13px]">
+              ค่า 200 เมตร คิดจากรัศมีที่เดินได้ใน 2–3 นาที ซึ่งครอบคลุม "จุดเดิม" แต่ไม่กว้างจนรวมปัญหาคนละเรื่อง
+              ส่วน 90 วันคือ window ที่เหมาะสมกับ SLA การแก้ไขระดับ structural ในเมือง
+            </p>
+          </div>
+
+          {/* Recurrence Count & Recency Weight */}
+          <div className="mt-3 rounded-lg border border-border bg-muted/40 p-4 space-y-2">
+            <h3 className="font-bold text-foreground">2) Recurrence Count และ Recency Weight</h3>
+            <p>
+              นับจำนวนครั้งที่เกิดซ้ำในจุดเดียวกัน และให้น้ำหนักกับเหตุที่เกิด <em>ใกล้ปัจจุบันมากกว่า</em>
+              เพราะปัญหาใหม่สะท้อนสภาพปัจจุบันได้ดีกว่า
+            </p>
+            <pre className="overflow-x-auto rounded bg-background p-3 text-[12.5px] leading-relaxed">
+{`recurrenceCount = Σ (recurrenceFlag_i)   // นับเฉพาะเคสที่ปิดแล้วในจุดนั้น
+
+recencyWeight_i = exp( −daysAgo_i / 30 )   // exponential decay ครึ่งชีวิต ≈ 30 วัน
+
+weightedRecurrence = Σ (recencyWeight_i × severity_i) / Σ (recencyWeight_i)
+                     // ค่าเฉลี่ยถ่วงน้ำหนักของความรุนแรง ณ จุดนั้น`}
+            </pre>
+            <ul className="list-disc pl-5 space-y-0.5">
+              <li><strong>recurrenceCount</strong> — จำนวนครั้งที่เกิดซ้ำ (ตั้งแต่ 0 ขึ้นไป)</li>
+              <li><strong>recencyWeight</strong> — น้ำหนักลดลงแบบเอกซ์โพเนนเชียล 30 วันหลังสุดนับเต็ม 60 วันหลังสุดนับครึ่ง</li>
+              <li><strong>weightedRecurrence</strong> — ความรุนแรงเฉลี่ยของปัญหาซ้ำ ณ จุดนั้น (ช่วง 0–100)</li>
+            </ul>
+          </div>
+
+          {/* พื้นที่เสี่ยง */}
+          <div className="mt-3 rounded-lg border border-border bg-muted/40 p-4 space-y-2">
+            <h3 className="font-bold text-foreground">3) พื้นที่เสี่ยง (Risk Area) — คะแนน 0–100</h3>
+            <p>
+              พื้นที่เสี่ยงคือจุดที่ <em>เกิดปัญหาซ้ำบ่อย + แต่ละครั้งรุนแรง</em>
+              คะแนนรวมความถี่ ความรุนแรง และความใหม่ของเหตุการณ์ล่าสุด
+            </p>
+            <pre className="overflow-x-auto rounded bg-background p-3 text-[12.5px] leading-relaxed">
+{`riskAreaScore = (
+  min(recurrenceCount, 8)       × 8     // ความถี่ (เพดาน 8 ครั้ง = 64 คะแนน)
+  + weightedRecurrence           × 0.25  // ความรุนแรงเฉลี่ยถ่วงน้ำหนัก
+  + maxRiskInLast90Days          × 0.15  // risk สูงสุดในช่วง 90 วันล่าสุด
+  + (mergedReportsInArea / 5)    × 2     // รายงานที่ถูกรวมในพื้นที่ (สัญญาณยืนยัน)
+)
+riskAreaScore = min(riskAreaScore, 100)`}
+            </pre>
+            <div>
+              <div className="font-semibold mt-2">เกณฑ์ระดับพื้นที่เสี่ยง</div>
+              <ul className="list-disc pl-5 mt-1 space-y-0.5">
+                <li>≥ 75 → <strong>พื้นที่เสี่ยงสูงมาก</strong> — ต้องตรวจสอบโครงสร้าง / นโยบายด่วน</li>
+                <li>≥ 55 → <strong>พื้นที่เสี่ยงสูง</strong> — ต้องมีมาตรการป้องกันเฉพาะจุด</li>
+                <li>≥ 35 → <strong>พื้นที่เสี่ยงปานกลาง</strong> — ติดตามและเพิ่มการลาดตระเวน</li>
+                <li>&lt; 35 → <strong>พื้นที่เสี่ยงต่ำ</strong> — บันทึกไว้ ไม่ต้องดำเนินการพิเศษ</li>
+              </ul>
+            </div>
+            <p className="text-muted-foreground text-[13px]">
+              เพดาน recurrenceCount = 8 เพื่อป้องกัน outlier ที่เกิดซ้ำมากผิดปกติครอบงำคะแนน
+              ส่วน mergedReportsInArea แปลงเป็น 1 คะแนนต่อ 5 รายงานที่ถูกรวม เพื่อสะท้อนความเชื่อมั่นว่าปัญหามีจริง
+            </p>
+          </div>
+
+          {/* พื้นที่ควรติดตามเชิงนโยบาย */}
+          <div className="mt-3 rounded-lg border border-border bg-muted/40 p-4 space-y-2">
+            <h3 className="font-bold text-foreground">4) พื้นที่ควรติดตามเชิงนโยบาย (Policy Watch Area)</h3>
+            <p>
+              บางพื้นที่อาจมี <em>ปัญหาซ้ำบ่อยแต่แต่ละครั้งไม่รุนแรง</em> เช่น จอดรถผิดกฎหมายซ้ำ ๆ ที่เดิม
+              ซึ่ง Risk Area Score อาจไม่สูง แต่หมายถึง <strong>นโยบายหรือโครงสร้างพื้นฐานมีช่องโหว่</strong>
+              ระบบจึงแยกประเภทนี้ออกมาเป็น "พื้นที่ควรติดตามเชิงนโยบาย"
+            </p>
+            <pre className="overflow-x-auto rounded bg-background p-3 text-[12.5px] leading-relaxed">
+{`policyWatchScore = (
+  min(recurrenceCount, 10)      × 5      // น้ำหนักความถี่สูงกว่า (เพดาน 50)
+  + (avgMergedReports × 3)                // รายงานซ้ำเฉลี่ยต่อเคส — ยิ่งสูง = ยิ่งมีปัญหาโครงสร้าง
+  + (closureRate × 20)                    // อัตราปิดเคส (0–1) × 20
+)
+policyWatchScore = min(policyWatchScore, 100)
+
+// เงื่อนไขการจัดประเภท
+isPolicyWatch = (
+  recurrenceCount ≥ 3
+  AND policyWatchScore ≥ 40
+  AND riskAreaScore < 55          // ไม่ใช่พื้นที่เสี่ยงสูง (ไม่เช่นนั้นจะเป็น Risk Area ไปแล้ว)
+  AND avgTimeToClose > 14         // แก้ไปแล้วแต่กลับมาอีก หรือใช้เวลาปิดนาน
+)`}
+            </pre>
+            <div>
+              <div className="font-semibold mt-2">เกณฑ์ระดับการติดตามเชิงนโยบาย</div>
+              <ul className="list-disc pl-5 mt-1 space-y-0.5">
+                <li>≥ 70 → <strong>ติดตามด่วน</strong> — ตรวจสอบกฎระเบียบ/โครงสร้าง เช่น ขาดที่จอดรถ ขาดป้ายกำกับ</li>
+                <li>≥ 50 → <strong>ติดตาม</strong> — ประเมินนโยบายปัจจุบัน เช่น เวลาห้ามจอด จำนวนพนักงานจราจร</li>
+                <li>≥ 35 → <strong>เฝ้าระวัง</strong> — บันทึกไว้ รอข้อมูลเพิ่มเติมก่อนสรุป</li>
+                <li>&lt; 35 → <strong>ไม่ต้องดำเนินการเชิงนโยบาย</strong> — เป็นปัญหาเฉพาะกรณี</li>
+              </ul>
+            </div>
+            <p className="text-muted-foreground text-[13px]">
+              ความแตกต่างสำคัญ: พื้นที่เสี่ยงเน้นความรุนแรงของแต่ละเหตุ (เช่น น้ำท่วมถนน/กีดขวางฉุกเฉิน)
+              ส่วนพื้นที่ควรติดตามเชิงนโยบายเน้นความถี่และรูปแบบที่ซ้ำซาก (เช่น จอดผิดกฎซ้ำ ๆ)
+              ซึ่งบ่งชี้ว่าการแก้ไขแบบ reactive ไม่พอ ต้องมีการวางนโยบายเชิงรุก
+            </p>
+          </div>
+
+          {/* Worked example */}
+          <div className="mt-3 rounded-lg border border-border bg-muted/40 p-4 space-y-2">
+            <h3 className="font-bold text-foreground">ตัวอย่างการคำนวณจริง</h3>
+            <p>
+              จุด A: <strong>“จอดรถผิดกฎหมายหน้าตลาด”</strong> — เกิดซ้ำ 5 ครั้งใน 90 วัน
+              แต่ละครั้ง risk ประมาณ 55, รายงานถูกรวมเฉลี่ย 4 ครั้ง/เคส, ปิดเคสใช้เวลา 18 วัน
+            </p>
+            <pre className="overflow-x-auto rounded bg-background p-3 text-[12.5px] leading-relaxed">
+{`recurrenceCount = 5
+weightedRecurrence ≈ 55 (ทุกครั้งคล้ายกัน)
+maxRiskInLast90Days = 55
+mergedReportsInArea = 5 × 4 = 20
+
+riskAreaScore = min(5,8)×8 + 55×0.25 + 55×0.15 + (20/5)×2
+              = 40 + 13.75 + 8.25 + 8
+              = 70.0  →  พื้นที่เสี่ยงสูง
+
+policyWatchScore = min(5,10)×5 + 4×3 + (0.8×20)
+                 = 25 + 12 + 16
+                 = 53.0  →  ติดตาม (เชิงนโยบาย)
+
+// สรุป: จุดนี้ได้ทั้ง "พื้นที่เสี่ยงสูง" และ "พื้นที่ติดตามเชิงนโยบาย"
+// แนะนำ: ลงโทษ/เพิ่มการลาดตระเวนระยะสั้น + ศึกษาการจัดที่จอดรถ/เวลาห้ามจอดระยะยาว`}
+            </pre>
+          </div>
+        </Block>
 
         <Block icon={<CheckCircle2 className="h-5 w-5" />} tone="bg-success/10 text-success" title="สิ่งที่ Prototype นี้ทำได้">
           <ul className="list-disc pl-5 space-y-1.5">
