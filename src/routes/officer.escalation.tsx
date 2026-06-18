@@ -98,7 +98,7 @@ function EscalationPage() {
     { key: "coordinator", label: "อยู่ที่ผู้ประสานงานกลาง", count: atCoordinator.length },
     { key: "multi", label: "ถูกส่งต่อหลายครั้ง", count: multiTransfer.length },
     { key: "supervisor", label: "ต้องเห็นโดยหัวหน้าหน่วยงาน", count: atSupervisor.length },
-    { key: "executive", label: "Dashboard ผู้บริหาร", count: atExecutive.length },
+    { key: "executive", label: "ผู้บริหารเมือง", count: atExecutive.length },
     { key: "all", label: "ทั้งหมด", count: items.length },
   ];
 
