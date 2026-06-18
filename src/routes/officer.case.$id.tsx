@@ -2,7 +2,8 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { RiskBadge, StatusBadge } from "@/components/badges";
 import { MiniMap } from "@/components/mini-map";
-import { getCase, STATUS_ORDER, TIMELINE_STEPS, type Status } from "@/lib/abjust-data";
+import { STATUS_ORDER, TIMELINE_STEPS, type Status } from "@/lib/abjust-data";
+import { casesStore, useCase } from "@/lib/cases-store";
 import { useRole } from "@/lib/use-role";
 import { useState } from "react";
 import {
@@ -29,10 +30,10 @@ export const Route = createFileRoute("/officer/case/$id")({
 function CaseDetail() {
   const { id } = Route.useParams();
   const router = useRouter();
-  const c = getCase(id);
+  const c = useCase(id);
   const [role] = useRole();
-  const [status, setStatus] = useState<Status>(c?.status ?? "รับเรื่องแล้ว");
-  const [saved, setSaved] = useState(false);
+  const [notified, setNotified] = useState(false);
+  const [flash, setFlash] = useState<string | null>(null);
   const viewOnly = role !== "officer";
 
   if (!c) {
@@ -47,6 +48,18 @@ function CaseDetail() {
       </AppShell>
     );
   }
+
+  const status = c.status;
+  const setStatus = (s: Status) => {
+    casesStore.updateStatus(c.id, s);
+    setFlash(`อัปเดตสถานะเป็น: ${s}`);
+    setTimeout(() => setFlash(null), 2000);
+  };
+  const notify = () => {
+    setNotified(true);
+    setFlash(`แจ้งเตือนผู้รายงาน ${c.mergedReports} รายผ่าน LINE/SMS แล้ว`);
+    setTimeout(() => setFlash(null), 2500);
+  };
 
   const mergedReports = Array.from({ length: Math.min(c.mergedReports, 5) }).map((_, i) => ({
     id: `RPT-${(8120 + i).toString()}`,
