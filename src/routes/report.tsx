@@ -279,20 +279,16 @@ function ReportPage() {
             </Field>
           </Section>
 
-          <Section title="D. ระดับความเร่งด่วน" subtitle="ระบบจะนำไปประกอบการคำนวณ Risk Score">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-              {urgencyLevels.map((u) => (
-                <button
-                  key={u.value}
-                  onClick={() => setUrgency(u.value)}
-                  className={`rounded-xl border-2 px-3 py-3 text-left transition ${
-                    urgency === u.value ? "border-primary ring-2 ring-primary/15" : u.tone
-                  }`}
-                >
-                  <div className="text-sm font-semibold text-foreground">{u.label}</div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5">{u.desc}</div>
-                </button>
-              ))}
+          <Section title="D. การประเมิน" subtitle="หลังกดส่ง AI จะประเมินความรุนแรงและความเร่งด่วนเองจากข้อมูลข้างต้น — คุณไม่ต้องเลือกระดับเอง">
+            <div className="rounded-xl border border-info/30 bg-info/5 px-4 py-3 text-xs text-info-foreground flex items-start gap-2">
+              <Sparkles className="h-4 w-4 text-info shrink-0 mt-0.5" />
+              <div>
+                <div className="font-semibold text-foreground">AI จะคำนวณให้อัตโนมัติ</div>
+                <div className="text-muted-foreground mt-0.5">
+                  base severity จากหมวดปัญหา · จำนวนผู้ได้รับผลกระทบ · ชั่วโมงเร่งด่วน · ความรุนแรงจากภาพ ·
+                  การพบเหตุซ้ำในจุดเดิม
+                </div>
+              </div>
             </div>
           </Section>
 
