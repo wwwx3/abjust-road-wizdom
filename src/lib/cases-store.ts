@@ -3,7 +3,32 @@
 import { useSyncExternalStore } from "react";
 import { MOCK_CASES, type Case, type Status } from "./abjust-data";
 
+const MINE_KEY = "abjust:mine";
+const SEED_MINE = ["ABJ-2410-0871"];
+
+function loadMine(): Set<string> {
+  if (typeof window === "undefined") return new Set(SEED_MINE);
+  try {
+    const raw = window.localStorage.getItem(MINE_KEY);
+    if (!raw) return new Set(SEED_MINE);
+    const arr = JSON.parse(raw) as string[];
+    return new Set(arr.length ? arr : SEED_MINE);
+  } catch {
+    return new Set(SEED_MINE);
+  }
+}
+
+function saveMine(s: Set<string>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(MINE_KEY, JSON.stringify([...s]));
+  } catch {
+    /* ignore */
+  }
+}
+
 let cases: Case[] = [...MOCK_CASES];
+let mine: Set<string> = loadMine();
 let lastCreatedId: string | null = null;
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
@@ -30,19 +55,29 @@ export const casesStore = {
     );
     emit();
   },
-  addCase(c: Case) {
+  addCase(c: Case, mineFlag = true) {
     cases = [c, ...cases];
     lastCreatedId = c.id;
+    if (mineFlag) {
+      mine.add(c.id);
+      saveMine(mine);
+    }
     emit();
   },
-  incrementMerged(id: string) {
+  incrementMerged(id: string, mineFlag = true) {
     cases = cases.map((c) =>
       c.id === id ? { ...c, mergedReports: c.mergedReports + 1, updatedAt: "เมื่อสักครู่" } : c,
     );
     lastCreatedId = id;
+    if (mineFlag) {
+      mine.add(id);
+      saveMine(mine);
+    }
     emit();
   },
   getLastCreatedId: () => lastCreatedId,
+  getMineIds: () => [...mine],
+  isMine: (id: string) => mine.has(id),
 };
 
 function stepForStatus(s: Status, fallback: number): number {
@@ -63,6 +98,11 @@ export function useCases(): Case[] {
 export function useCase(id: string): Case | undefined {
   const all = useCases();
   return all.find((c) => c.id === id);
+}
+
+export function useMyCases(): Case[] {
+  const all = useCases();
+  return all.filter((c) => casesStore.isMine(c.id));
 }
 
 export function nextCaseId(): string {
