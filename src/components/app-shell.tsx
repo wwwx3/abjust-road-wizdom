@@ -14,19 +14,17 @@ import {
 import { useState, type ReactNode } from "react";
 import { useRole } from "@/lib/use-role";
 import { cn } from "@/lib/utils";
+import logoUrl from "@/assets/abjust-logo.jpg";
 
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link to="/" className="flex items-center gap-2.5 group">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
-        <div className="flex items-end gap-[2px] leading-none">
-          <span className="text-brand text-lg font-black">A</span>
-          <span className="text-success text-lg font-black">j</span>
-        </div>
+      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand/25 via-background to-success/25 ring-1 ring-border/60 shadow-sm overflow-hidden">
+        <img src={logoUrl} alt="Abjust" className="h-9 w-9 object-contain" />
       </div>
       {!compact && (
         <div className="leading-tight">
-          <div className="text-[15px] font-bold tracking-tight text-foreground">Abjust</div>
+          <div className="text-[15px] font-bold tracking-tight bg-gradient-to-r from-brand to-success bg-clip-text text-transparent">Abjust</div>
           <div className="text-[10.5px] font-medium text-muted-foreground -mt-0.5">
             Bangkok Traffic Risk Triage
           </div>
