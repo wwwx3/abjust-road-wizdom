@@ -21,7 +21,7 @@ function AboutPage() {
 
         <Block icon={<Sparkles className="h-5 w-5" />} tone="bg-brand/15 text-[oklch(0.42_0.13_60)]" title="Escalation Ladder & Audit Trail">
           <p>
-            Road Wizdom ไม่ได้หยุดที่การแจ้งเตือน เพราะการแจ้งเตือนอาจถูกละเลยได้
+            Abjust ไม่ได้หยุดที่การแจ้งเตือน เพราะการแจ้งเตือนอาจถูกละเลยได้
             ระบบจึงใช้ <strong>Escalation Ladder</strong> และ <strong>Audit Trail</strong>
             เพื่อให้เคสที่ค้างเกินกำหนดถูกส่งต่อเป็นลำดับขั้นโดยอัตโนมัติ
             และทำให้เห็นว่าเคสติดอยู่ที่ขั้นตอนไหน ต้องการการตัดสินใจจากระดับใด
