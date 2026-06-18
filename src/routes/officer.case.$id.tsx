@@ -33,6 +33,7 @@ function CaseDetail() {
   const { id } = Route.useParams();
   const router = useRouter();
   const c = useCase(id);
+  const escState = useEscalation(id);
   const [role] = useRole();
   const [notified, setNotified] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
