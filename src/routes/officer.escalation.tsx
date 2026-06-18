@@ -212,7 +212,7 @@ function EscalationPage() {
               )}
             >
               <span className="whitespace-pre-line">
-                {f.label === "เสี่ยงสูง · ยังไม่มีผู้ดูเเล\n0" ? "เสี่ยงสูง · ยังไม่มีผู้ดูเเล" : f.label}
+                {f.label}
               </span>
               <span
                 className={cn(
