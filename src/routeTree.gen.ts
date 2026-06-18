@@ -17,6 +17,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReportResultRouteImport } from './routes/report.result'
 import { Route as ReportProcessingRouteImport } from './routes/report.processing'
+import { Route as OfficerEscalationRouteImport } from './routes/officer.escalation'
 import { Route as CitizenTimelineRouteImport } from './routes/citizen.timeline'
 import { Route as OfficerCaseIdRouteImport } from './routes/officer.case.$id'
 
@@ -60,6 +61,11 @@ const ReportProcessingRoute = ReportProcessingRouteImport.update({
   path: '/processing',
   getParentRoute: () => ReportRoute,
 } as any)
+const OfficerEscalationRoute = OfficerEscalationRouteImport.update({
+  id: '/escalation',
+  path: '/escalation',
+  getParentRoute: () => OfficerRoute,
+} as any)
 const CitizenTimelineRoute = CitizenTimelineRouteImport.update({
   id: '/citizen/timeline',
   path: '/citizen/timeline',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
   '/officer/case/$id': typeof OfficerCaseIdRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
     | '/officer/case/$id'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
     | '/officer/case/$id'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
     | '/officer/case/$id'
@@ -215,6 +227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportProcessingRouteImport
       parentRoute: typeof ReportRoute
     }
+    '/officer/escalation': {
+      id: '/officer/escalation'
+      path: '/escalation'
+      fullPath: '/officer/escalation'
+      preLoaderRoute: typeof OfficerEscalationRouteImport
+      parentRoute: typeof OfficerRoute
+    }
     '/citizen/timeline': {
       id: '/citizen/timeline'
       path: '/citizen/timeline'
@@ -233,10 +252,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface OfficerRouteChildren {
+  OfficerEscalationRoute: typeof OfficerEscalationRoute
   OfficerCaseIdRoute: typeof OfficerCaseIdRoute
 }
 
 const OfficerRouteChildren: OfficerRouteChildren = {
+  OfficerEscalationRoute: OfficerEscalationRoute,
   OfficerCaseIdRoute: OfficerCaseIdRoute,
 }
 
