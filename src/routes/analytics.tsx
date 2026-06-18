@@ -220,3 +220,12 @@ function Kpi({ icon, tone, label, value, delta }: { icon: React.ReactNode; tone:
     </div>
   );
 }
+
+function ExecStat({ label, value, tone }: { label: string; value: number | string; tone: string }) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-3">
+      <div className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground leading-snug">{label}</div>
+      <div className={cn("mt-1 text-2xl font-extrabold tabular-nums", tone)}>{value}</div>
+    </div>
+  );
+}
