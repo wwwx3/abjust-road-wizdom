@@ -132,59 +132,21 @@ function ReportPage() {
     }
     setSubmitting(true);
 
-    // --- AI pipeline (offline rule-based) ---
-    const impactedCount = impactedFromUrgency(urgency);
-    const openCases = casesStore
-      .getAll()
-      .filter((c) => c.status !== "แก้ไขเสร็จสิ้น")
-      .map((c) => ({ id: c.id, category: c.category, lat: c.location.lat, lng: c.location.lng }));
-    const dup = findDuplicate(openCases, { category, lat: latN, lng: lngN });
-
-    if (dup) {
-      casesStore.incrementMerged(dup.case.id);
-      setTimeout(() => router.navigate({ to: "/report/result" }), 400);
-      return;
-    }
-
-    const recurrence = casesStore
-      .getAll()
-      .filter((c) => c.category === category).length;
-    const risk = riskScore({ category, impactedCount, recurrenceCount: recurrence });
-    const level = riskLevelOf(risk);
-    const imageSeverity = attachments.length > 0 ? 60 : 25;
-    const _prio = priorityScore({
-      risk,
-      impactedCount,
-      reporterCount: 1,
-      ageHours: 0,
-      imageSeverity,
-    });
-    const summary = generateDescription({
+    // Hand off to live AI processing page — citizen no longer picks severity.
+    const imageSeverity = attachments.length === 0 ? 25 : Math.min(85, 45 + attachments.length * 10);
+    casesStore.setDraft({
       category,
       description: desc,
       lat: latN,
       lng: lngN,
       locationLabel: label,
+      note,
+      attachmentCount: attachments.length,
+      imageSeverity,
+      createdAt: Date.now(),
     });
-    const id = nextCaseId();
-    const newCase: Case = {
-      id,
-      category,
-      title: desc.split("\n")[0].slice(0, 70) || `รายงาน ${category}`,
-      summary: summary + ` · SLA: ${slaHint(level)}`,
-      riskScore: risk,
-      riskLevel: level,
-      status: "รับเรื่องแล้ว",
-      mergedReports: 1,
-      unit: recommendUnit(category),
-      district: label || "ไม่ระบุเขต",
-      location: { lat: latN, lng: lngN, label: label || "พิกัดที่ผู้แจ้งระบุ" },
-      updatedAt: "เมื่อสักครู่",
-      currentStep: 2,
-    };
-    casesStore.addCase(newCase);
 
-    setTimeout(() => router.navigate({ to: "/report/result" }), 400);
+    router.navigate({ to: "/report/processing" });
   };
 
   return (
