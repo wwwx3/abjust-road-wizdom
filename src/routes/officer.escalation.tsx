@@ -94,7 +94,7 @@ function EscalationPage() {
 
   const filters: { key: FilterKey; label: string; count: number }[] = [
     { key: "overdue", label: "ค้างเกินกำหนด", count: overdue.length },
-    { key: "noOwner", label: "เสี่ยงสูง · ยังไม่มีเจ้าภาพ", count: noOwnerHighRisk.length },
+    { key: "noOwner", label: "เสี่ยงสูง · ยังไม่มีผู้ดูเเล\n", count: noOwnerHighRisk.length },
     { key: "coordinator", label: "อยู่ที่ผู้ประสานงานกลาง", count: atCoordinator.length },
     { key: "multi", label: "ถูกส่งต่อหลายครั้ง", count: multiTransfer.length },
     { key: "supervisor", label: "ต้องเห็นโดยหัวหน้าหน่วยงาน", count: atSupervisor.length },
@@ -205,16 +205,18 @@ function EscalationPage() {
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold transition border",
+                "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold transition border text-left",
                 filter === f.key
                   ? "bg-primary text-primary-foreground border-primary"
                   : "bg-card text-foreground border-border hover:bg-accent",
               )}
             >
-              {f.label}
+              <span className="whitespace-pre-line">
+                {f.label}
+              </span>
               <span
                 className={cn(
-                  "rounded-full px-1.5 py-0.5 text-[10px] font-bold",
+                  "rounded-full px-1.5 py-0.5 text-[10px] font-bold shrink-0 self-center",
                   filter === f.key ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground",
                 )}
               >
