@@ -37,8 +37,22 @@ let cases: Case[] = [...MOCK_CASES];
 let mine: Set<string> = loadMine();
 let lastCreatedId: string | null = null;
 let pendingDraft: Draft | null = null;
+const escalations: Map<string, EscalationState> = new Map(
+  cases.map((c) => [c.id, seedEscalation(c)]),
+);
 const listeners = new Set<() => void>();
 const emit = () => listeners.forEach((l) => l());
+
+function ensureEsc(id: string): EscalationState | undefined {
+  const c = cases.find((x) => x.id === id);
+  if (!c) return undefined;
+  let s = escalations.get(id);
+  if (!s) {
+    s = seedEscalation(c);
+    escalations.set(id, s);
+  }
+  return s;
+}
 
 export interface Draft {
   category: string;
