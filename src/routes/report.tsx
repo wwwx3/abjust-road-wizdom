@@ -1,4 +1,4 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useRouter, Outlet, useRouterState } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { CATEGORIES, SAMPLE_REPORT, riskLevelOf as _legacy } from "@/lib/abjust-data";
 import { MiniMap } from "@/components/mini-map";
