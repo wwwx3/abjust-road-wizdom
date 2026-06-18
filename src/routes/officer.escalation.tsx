@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/app-shell";
 import { RiskBadge } from "@/components/badges";
-import { casesStore, useAllEscalations } from "@/lib/cases-store";
+import { casesStore, useAllEscalations, useEscalation, useCase } from "@/lib/cases-store";
 import {
   ESCALATION_LADDER,
   timeRemainingLabel,
@@ -10,6 +10,7 @@ import {
 } from "@/lib/escalation";
 import { DEMO_ESCALATION_CASE_ID } from "@/lib/abjust-data";
 import { useRole } from "@/lib/use-role";
+import { EscalationLadder, AuditTrail } from "@/components/escalation-ladder";
 import {
   AlertTriangle,
   Flame,
@@ -24,6 +25,7 @@ import {
   RotateCcw,
   Workflow,
   Info,
+  Radio,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -35,10 +37,11 @@ export const Route = createFileRoute("/officer/escalation")({
 
 function EscalationPage() {
   const items = useAllEscalations();
-  const [role] = useRole();
-  const isOfficer = role === "officer";
+  const [, setRole] = useRole();
   const [flash, setFlash] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
+  const demoCase = useCase(DEMO_ESCALATION_CASE_ID);
+  const demoState = useEscalation(DEMO_ESCALATION_CASE_ID);
 
   const overdue = items.filter(
     (x) => x.state.overdue || x.state.deadlineAt - Date.now() <= 0,
@@ -58,6 +61,7 @@ function EscalationPage() {
 
   const runDemo = async () => {
     if (running) return;
+    setRole("officer"); // ensure role is officer so officer actions work after demo
     setRunning(true);
     await casesStore.runDemoSequence(DEMO_ESCALATION_CASE_ID, (label) =>
       showFlash(label),
@@ -70,26 +74,63 @@ function EscalationPage() {
     showFlash("รีเซ็ตเคสตัวอย่างกลับสู่สถานะเริ่มต้น");
   };
 
+  const acceptDemo = () => {
+    casesStore.acceptCase(DEMO_ESCALATION_CASE_ID, "หน่วยบังคับใช้กฎหมายจราจร");
+    showFlash("หน่วยงานหลักรับเคสแล้ว");
+  };
+
   return (
     <AppShell
       title="Escalation & Audit"
       subtitle="ลำดับการส่งต่อและบันทึกความรับผิดชอบ — workflow visibility, ไม่ใช่การลงโทษ"
     >
       <div className="space-y-5">
-        {!isOfficer && (
-          <div className="rounded-xl border border-info/30 bg-info/5 px-4 py-2.5 text-xs text-info flex items-center gap-2">
-            <Eye className="h-4 w-4" /> โหมดดูอย่างเดียว —
-            เปลี่ยนเป็นบทบาทเจ้าหน้าที่เพื่อจำลองการส่งต่อ
-          </div>
-        )}
-
         {/* Dedicated demo card */}
         <DemoSimulatorCard
           running={running}
-          disabled={!isOfficer}
           onRun={runDemo}
           onReset={resetDemo}
         />
+
+        {/* Live demo state — shows the simulator's effect on THIS page */}
+        {demoCase && demoState && (
+          <section>
+            <SectionHeader
+              title="สถานะเคสตัวอย่างแบบเรียลไทม์"
+              subtitle={`${demoCase.id} · ${demoCase.title}`}
+              right={
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-success">
+                  <Radio className="h-3 w-3 animate-pulse" /> Live
+                </span>
+              }
+            />
+            <div className="grid lg:grid-cols-2 gap-3">
+              <div className="card-elevated p-4 sm:p-5">
+                <EscalationLadder state={demoState} />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {!demoState.accepted && demoState.level >= 1 && (
+                    <button
+                      onClick={acceptDemo}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-success px-3 py-2 text-xs font-semibold text-white hover:opacity-90 transition"
+                    >
+                      ✓ รับเคสเป็นหน่วยงานหลัก
+                    </button>
+                  )}
+                  <Link
+                    to="/officer/case/$id"
+                    params={{ id: DEMO_ESCALATION_CASE_ID }}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground hover:bg-accent transition"
+                  >
+                    เปิดมุมเจ้าหน้าที่ <ArrowRight className="h-3 w-3" />
+                  </Link>
+                </div>
+              </div>
+              <div className="card-elevated p-4 sm:p-5">
+                <AuditTrail state={demoState} />
+              </div>
+            </div>
+          </section>
+        )}
 
         {flash && (
           <div className="rounded-xl bg-success/10 border border-success/30 px-3 py-2 text-xs font-semibold text-success">
@@ -98,6 +139,7 @@ function EscalationPage() {
         )}
 
         {/* Executive summary */}
+
         <section>
           <SectionHeader
             title="Executive summary — สุขภาพของกระบวนการ"
