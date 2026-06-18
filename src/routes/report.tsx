@@ -37,6 +37,8 @@ interface Attachment {
 
 function ReportPage() {
   const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  if (pathname !== "/report") return <Outlet />;
   const [category, setCategory] = useState("");
   const [desc, setDesc] = useState("");
   const [lat, setLat] = useState("");
