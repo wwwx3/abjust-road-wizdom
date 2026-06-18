@@ -190,7 +190,7 @@ function CaseDetail() {
                   <div className="relative mt-1.5">
                     <select
                       value={status}
-                      onChange={(e) => { setStatus(e.target.value as Status); setSaved(false); }}
+                      onChange={(e) => setStatus(e.target.value as Status)}
                       className="w-full appearance-none rounded-xl border border-input bg-card px-4 py-2.5 pr-10 text-sm font-medium outline-none focus:ring-2 focus:ring-ring/40"
                     >
                       {STATUS_ORDER.map((s) => (
@@ -199,30 +199,39 @@ function CaseDetail() {
                     </select>
                     <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   </div>
+                  <div className="mt-1 text-[11px] text-muted-foreground">
+                    หรือลากการ์ดบนหน้า Dashboard เพื่อเปลี่ยนสถานะ
+                  </div>
                 </div>
 
                 <div className="mt-3 flex flex-col gap-2">
                   <button
-                    onClick={() => setSaved(true)}
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:opacity-90 transition"
+                    onClick={notify}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-accent transition"
                   >
-                    <CheckCircle2 className="h-4 w-4" /> บันทึกสถานะ
-                  </button>
-                  <button className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-accent transition">
                     <Bell className="h-4 w-4" /> แจ้งผู้รายงานทั้งหมด ({c.mergedReports})
                   </button>
-                  <button className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-success/30 bg-success/5 px-4 py-2.5 text-sm font-semibold text-success hover:bg-success/10 transition">
+                  <button
+                    onClick={() => setStatus("แก้ไขเสร็จสิ้น")}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-success/30 bg-success/5 px-4 py-2.5 text-sm font-semibold text-success hover:bg-success/10 transition"
+                  >
                     <Send className="h-4 w-4" /> ทำเครื่องหมายว่าแก้ไขแล้ว
                   </button>
                 </div>
 
-                {saved && (
+                {flash && (
                   <div className="mt-3 rounded-xl bg-success/10 px-3 py-2 text-xs font-semibold text-success">
-                    ✓ บันทึกสถานะใหม่เรียบร้อย
+                    ✓ {flash}
+                  </div>
+                )}
+                {notified && (
+                  <div className="mt-2 rounded-xl bg-info/10 px-3 py-2 text-[11px] text-info">
+                    ตัวอย่างข้อความที่ส่ง: "เคส {c.id} อัปเดตสถานะเป็น {status} — Abjust"
                   </div>
                 )}
               </div>
             )}
+
 
             {/* Timeline */}
             <div className="card-elevated p-5 sm:p-6">
