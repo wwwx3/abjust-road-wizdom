@@ -633,6 +633,78 @@ function Legend() {
   );
 }
 
+function DistrictInsight({ name }: { name: string }) {
+  const d = BKK_DISTRICTS.find((x) => x.name === name);
+  if (!d) return null;
+  const total = d.unresolved + d.pushedBack;
+  const top = topCasesForDistrict(d.name, Math.max(total, 8));
+  const sum = top.reduce((s, x) => s + x.count, 0);
+
+  return (
+    <div className="mt-4 rounded-2xl border border-border bg-card overflow-hidden">
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border bg-gradient-to-r from-danger/5 to-transparent">
+        <div className="min-w-0">
+          <div className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+            เขตที่เลือก
+          </div>
+          <div className="text-sm font-extrabold text-foreground truncate">
+            เขต{d.name}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 text-[10.5px] text-muted-foreground shrink-0">
+          <Tag tone="danger">ค้าง {d.unresolved}</Tag>
+          <Tag tone="amber">ตีกลับ {d.pushedBack}</Tag>
+        </div>
+      </div>
+
+      <div className="p-4 space-y-3">
+        <div className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+          ปัญหาที่เกิดบ่อยที่สุดในเขตนี้
+        </div>
+        <div className="space-y-2">
+          {top.map((row, i) => {
+            const pct = Math.round((row.count / sum) * 100);
+            return (
+              <div key={row.category.key} className="rounded-xl border border-border bg-background p-3">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-danger/10 text-[10px] font-extrabold text-danger">
+                      {i + 1}
+                    </span>
+                    <div className="text-xs font-bold text-foreground truncate">
+                      {row.category.label}
+                    </div>
+                  </div>
+                  <div className="text-[11px] font-bold text-foreground tabular-nums shrink-0">
+                    {row.count} <span className="text-muted-foreground font-medium">เคส · {pct}%</span>
+                  </div>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-danger/80"
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+                <div className="mt-2.5 flex items-start gap-1.5">
+                  <Lightbulb className="h-3.5 w-3.5 text-[oklch(0.65_0.15_75)] mt-0.5 shrink-0" />
+                  <div className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    แนวทางป้องกัน
+                  </div>
+                </div>
+                <ul className="mt-1 ml-5 list-disc space-y-0.5 text-[11px] leading-relaxed text-foreground">
+                  {row.category.prevention.map((p) => (
+                    <li key={p}>{p}</li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // suppress unused icon import warnings if any
 void AlertTriangle;
 void Flame;
