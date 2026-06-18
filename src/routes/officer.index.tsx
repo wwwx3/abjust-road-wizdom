@@ -9,7 +9,7 @@ import { Layers, MapPin, Clock, Plus, Filter, Flame, GripVertical, Lock, Info } 
 import { cn } from "@/lib/utils";
 import { useMemo, useState } from "react";
 
-export const Route = createFileRoute("/officer")({
+export const Route = createFileRoute("/officer/")({
   head: () => ({ meta: [{ title: "Dashboard เจ้าหน้าที่ — Abjust" }] }),
   component: OfficerDashboard,
 });
