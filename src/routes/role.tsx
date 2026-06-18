@@ -14,7 +14,7 @@ function RolePage() {
 
   const choose = (role: "citizen" | "officer") => {
     setRole(role);
-    router.navigate({ to: role === "citizen" ? "/report" : "/officer" });
+    router.navigate({ to: role === "citizen" ? "/crisis-check" : "/officer" });
   };
 
   return (

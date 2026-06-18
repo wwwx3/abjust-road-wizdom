@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RoleRouteImport } from './routes/role'
 import { Route as ReportRouteImport } from './routes/report'
 import { Route as PublicRouteImport } from './routes/public'
+import { Route as CrisisCheckRouteImport } from './routes/crisis-check'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -36,6 +37,11 @@ const ReportRoute = ReportRouteImport.update({
 const PublicRoute = PublicRouteImport.update({
   id: '/public',
   path: '/public',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CrisisCheckRoute = CrisisCheckRouteImport.update({
+  id: '/crisis-check',
+  path: '/crisis-check',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalyticsRoute = AnalyticsRouteImport.update({
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
+  '/crisis-check': typeof CrisisCheckRoute
   '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
+  '/crisis-check': typeof CrisisCheckRoute
   '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/analytics': typeof AnalyticsRoute
+  '/crisis-check': typeof CrisisCheckRoute
   '/public': typeof PublicRoute
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/analytics'
+    | '/crisis-check'
     | '/public'
     | '/report'
     | '/role'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/analytics'
+    | '/crisis-check'
     | '/public'
     | '/report'
     | '/role'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/analytics'
+    | '/crisis-check'
     | '/public'
     | '/report'
     | '/role'
@@ -187,6 +199,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AnalyticsRoute: typeof AnalyticsRoute
+  CrisisCheckRoute: typeof CrisisCheckRoute
   PublicRoute: typeof PublicRoute
   ReportRoute: typeof ReportRouteWithChildren
   RoleRoute: typeof RoleRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       path: '/public'
       fullPath: '/public'
       preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crisis-check': {
+      id: '/crisis-check'
+      path: '/crisis-check'
+      fullPath: '/crisis-check'
+      preLoaderRoute: typeof CrisisCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analytics': {
@@ -310,6 +330,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AnalyticsRoute: AnalyticsRoute,
+  CrisisCheckRoute: CrisisCheckRoute,
   PublicRoute: PublicRoute,
   ReportRoute: ReportRouteWithChildren,
   RoleRoute: RoleRoute,
