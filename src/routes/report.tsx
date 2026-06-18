@@ -16,18 +16,7 @@ import {
   Image as ImageIcon,
   Upload,
 } from "lucide-react";
-import {
-  generateDescription,
-  riskScore,
-  riskLevelOf,
-  priorityScore,
-  findDuplicate,
-  recommendUnit,
-  impactedFromUrgency,
-  slaHint,
-} from "@/lib/ai-pipeline";
-import { casesStore, nextCaseId } from "@/lib/cases-store";
-import type { Case } from "@/lib/abjust-data";
+import { casesStore } from "@/lib/cases-store";
 
 // silence unused legacy import warning (kept for backward-compat re-export)
 void _legacy;
