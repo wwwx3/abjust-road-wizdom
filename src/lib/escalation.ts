@@ -72,7 +72,24 @@ export interface EscalationState {
   deadlineAt: number;          // epoch ms when next escalation will trigger
   transferCount: number;
   overdue: boolean;
+  accepted: boolean;           // หน่วยงานหลักรับเคสแล้วหรือยัง
+  currentOwner: string;        // ผู้รับผิดชอบขั้นปัจจุบัน
+  supportingUnit?: string;     // หน่วยงานร่วมที่ถูกขอ
+  nextAction: string;          // ขั้นตอนถัดไปที่ต้องทำ
   audit: AuditEvent[];
+}
+
+const DEFAULT_NEXT_ACTION_BY_CATEGORY: Record<string, string> = {
+  "กีดขวางทางรถฉุกเฉิน":
+    "ตรวจสอบพื้นที่และประสานการเคลื่อนย้ายรถที่กีดขวางทางฉุกเฉิน",
+  "สัญญาณไฟจราจรผิดปกติ": "ส่งทีมเทคนิคตรวจสอบและซ่อมสัญญาณไฟ",
+  "น้ำท่วมถนนกระทบการจราจร": "ประสานสำนักการระบายน้ำเร่งระบายและจัดจราจร",
+};
+function defaultNextAction(c: Case): string {
+  return (
+    DEFAULT_NEXT_ACTION_BY_CATEGORY[c.category] ??
+    "ประสานหน่วยงานที่เกี่ยวข้องเพื่อตรวจสอบและดำเนินการในพื้นที่"
+  );
 }
 
 const nowFromNowLabel = (label: string): number => {
