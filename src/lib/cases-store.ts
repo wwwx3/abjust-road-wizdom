@@ -200,10 +200,94 @@ export const casesStore = {
           reason,
           level: s.level,
         }),
+        currentOwner: toUnit,
         transferCount: s.transferCount + 1,
       });
     }
     emit();
+  },
+  acceptCase(id: string, by?: string) {
+    const c = cases.find((x) => x.id === id);
+    const s = ensureEsc(id);
+    if (!c || !s) return;
+    const owner = by ?? c.unit;
+    cases = cases.map((x) =>
+      x.id === id
+        ? { ...x, status: "กำลังตรวจสอบ", unit: owner, updatedAt: "เมื่อสักครู่", currentStep: Math.max(x.currentStep, 3) }
+        : x,
+    );
+    escalations.set(id, {
+      ...appendAudit(s, {
+        actor: owner,
+        action: "หน่วยงานหลักรับเคสแล้ว และเริ่มดำเนินการตรวจสอบพื้นที่",
+        level: 1,
+      }),
+      level: 1,
+      accepted: true,
+      currentOwner: owner,
+      overdue: false,
+      reason: "หน่วยงานหลักรับเคสแล้ว",
+      deadlineAt: Date.now() + 6 * 3600_000,
+    });
+    emit();
+  },
+  setNextAction(id: string, text: string) {
+    const s = ensureEsc(id);
+    const c = cases.find((x) => x.id === id);
+    if (!s || !c) return;
+    escalations.set(id, {
+      ...appendAudit(s, {
+        actor: s.currentOwner,
+        action: "อัปเดตขั้นตอนถัดไปของเคส",
+        reason: text,
+        level: s.level,
+      }),
+      nextAction: text,
+    });
+    emit();
+  },
+  requestSupporting(id: string, unit: string, reason: string) {
+    const s = ensureEsc(id);
+    if (!s) return;
+    escalations.set(id, {
+      ...appendAudit(s, {
+        actor: s.currentOwner,
+        action: `ขอหน่วยงานร่วม: ${unit}`,
+        reason,
+        level: s.level,
+      }),
+      supportingUnit: unit,
+    });
+    emit();
+  },
+  resetDemo(id: string) {
+    const c = cases.find((x) => x.id === id);
+    if (!c) return;
+    cases = cases.map((x) =>
+      x.id === id
+        ? { ...x, status: "รับเรื่องแล้ว", currentStep: 0, updatedAt: "เมื่อสักครู่" }
+        : x,
+    );
+    escalations.set(id, seedEscalation({ ...c, status: "รับเรื่องแล้ว" }));
+    emit();
+  },
+  async runDemoSequence(id: string, onTick?: (label: string) => void, gapMs = 1200) {
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    this.resetDemo(id);
+    await wait(gapMs);
+    onTick?.("ค้างเกินกำหนด — ไม่มีการรับเคสภายใน 6 ชั่วโมง");
+    const s0 = ensureEsc(id);
+    if (s0) escalations.set(id, { ...s0, overdue: true, reason: "ไม่มีการรับเคสภายใน 6 ชั่วโมง", deadlineAt: Date.now() - 60_000 });
+    emit();
+    await wait(gapMs);
+    this.escalate(id, "ไม่มีการรับเคสภายใน 6 ชั่วโมง — ส่งต่อผู้ประสานงานกลางอัตโนมัติ");
+    onTick?.("ส่งต่อผู้ประสานงานกลางอัตโนมัติ");
+    await wait(gapMs);
+    this.escalate(id, "ผู้ประสานงานกลางยังไม่มีการอัปเดต — ยกระดับไปยังหัวหน้าหน่วยงาน");
+    onTick?.("ต้องเห็นโดยหัวหน้าหน่วยงาน");
+    await wait(gapMs);
+    this.escalate(id, "เคสความเสี่ยงสูงมากยังค้างอยู่ — แสดงใน Dashboard ผู้บริหารเมือง");
+    onTick?.("อยู่ใน Dashboard ผู้บริหารเมือง");
   },
 };
 
