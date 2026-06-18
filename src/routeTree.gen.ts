@@ -19,6 +19,7 @@ import { Route as OfficerIndexRouteImport } from './routes/officer.index'
 import { Route as ReportResultRouteImport } from './routes/report.result'
 import { Route as ReportProcessingRouteImport } from './routes/report.processing'
 import { Route as OfficerEscalationRouteImport } from './routes/officer.escalation'
+import { Route as ExecutivePriorityMapRouteImport } from './routes/executive.priority-map'
 import { Route as CitizenTimelineRouteImport } from './routes/citizen.timeline'
 import { Route as OfficerCaseIdRouteImport } from './routes/officer.case.$id'
 
@@ -72,6 +73,11 @@ const OfficerEscalationRoute = OfficerEscalationRouteImport.update({
   path: '/officer/escalation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExecutivePriorityMapRoute = ExecutivePriorityMapRouteImport.update({
+  id: '/executive/priority-map',
+  path: '/executive/priority-map',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CitizenTimelineRoute = CitizenTimelineRouteImport.update({
   id: '/citizen/timeline',
   path: '/citizen/timeline',
@@ -91,6 +97,7 @@ export interface FileRoutesByFullPath {
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/executive/priority-map': typeof ExecutivePriorityMapRoute
   '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/executive/priority-map': typeof ExecutivePriorityMapRoute
   '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/report': typeof ReportRouteWithChildren
   '/role': typeof RoleRoute
   '/citizen/timeline': typeof CitizenTimelineRoute
+  '/executive/priority-map': typeof ExecutivePriorityMapRoute
   '/officer/escalation': typeof OfficerEscalationRoute
   '/report/processing': typeof ReportProcessingRoute
   '/report/result': typeof ReportResultRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/executive/priority-map'
     | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/executive/priority-map'
     | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/report'
     | '/role'
     | '/citizen/timeline'
+    | '/executive/priority-map'
     | '/officer/escalation'
     | '/report/processing'
     | '/report/result'
@@ -179,6 +191,7 @@ export interface RootRouteChildren {
   ReportRoute: typeof ReportRouteWithChildren
   RoleRoute: typeof RoleRoute
   CitizenTimelineRoute: typeof CitizenTimelineRoute
+  ExecutivePriorityMapRoute: typeof ExecutivePriorityMapRoute
   OfficerEscalationRoute: typeof OfficerEscalationRoute
   OfficerIndexRoute: typeof OfficerIndexRoute
   OfficerCaseIdRoute: typeof OfficerCaseIdRoute
@@ -256,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OfficerEscalationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/executive/priority-map': {
+      id: '/executive/priority-map'
+      path: '/executive/priority-map'
+      fullPath: '/executive/priority-map'
+      preLoaderRoute: typeof ExecutivePriorityMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/citizen/timeline': {
       id: '/citizen/timeline'
       path: '/citizen/timeline'
@@ -294,6 +314,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReportRoute: ReportRouteWithChildren,
   RoleRoute: RoleRoute,
   CitizenTimelineRoute: CitizenTimelineRoute,
+  ExecutivePriorityMapRoute: ExecutivePriorityMapRoute,
   OfficerEscalationRoute: OfficerEscalationRoute,
   OfficerIndexRoute: OfficerIndexRoute,
   OfficerCaseIdRoute: OfficerCaseIdRoute,
@@ -301,13 +322,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
