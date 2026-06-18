@@ -121,6 +121,7 @@ function TimelinePage() {
             <div className="mt-4 rounded-2xl bg-muted/50 p-4 text-sm leading-relaxed text-foreground">
               {c.summary}
             </div>
+            <CitizenStatusPanel id={c.id} />
           </div>
 
           <div className="card-elevated p-5 sm:p-6">
