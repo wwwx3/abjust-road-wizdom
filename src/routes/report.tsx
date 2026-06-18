@@ -63,7 +63,6 @@ function ReportPage() {
     setLng(String(SAMPLE_REPORT.lng));
     setLabel(SAMPLE_REPORT.label);
     setNote(SAMPLE_REPORT.note);
-    setUrgency("critical");
     setError(null);
   };
 
