@@ -76,6 +76,7 @@ export const casesStore = {
     return cases.find((c) => c.id === id);
   },
   updateStatus(id: string, status: Status) {
+    const prev = cases.find((c) => c.id === id);
     cases = cases.map((c) =>
       c.id === id
         ? {
@@ -86,10 +87,24 @@ export const casesStore = {
           }
         : c,
     );
+    const s = ensureEsc(id);
+    if (s && prev) {
+      escalations.set(
+        id,
+        appendAudit(s, {
+          actor: prev.unit,
+          action: "เจ้าหน้าที่อัปเดตสถานะเคส",
+          fromStatus: prev.status,
+          toStatus: status,
+          level: s.level,
+        }),
+      );
+    }
     emit();
   },
   addCase(c: Case, mineFlag = true) {
     cases = [c, ...cases];
+    escalations.set(c.id, seedEscalation(c));
     lastCreatedId = c.id;
     if (mineFlag) {
       mine.add(c.id);
