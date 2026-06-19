@@ -1,4 +1,4 @@
-# Abjust — Bangkok Traffic Risk Triage
+# Abjust 
 
 **Abjust** คือโปรเจกต์ civic-tech สำหรับ Bangkok Hackathon 2026 ที่ออกแบบมาเป็น **Traffic-Risk Intelligence Layer** เพื่อช่วยเปลี่ยนรายงานปัญหาจราจรของประชาชนให้กลายเป็นเคสที่จัดลำดับความสำคัญ มีหน่วยงานรับผิดชอบ ติดตามได้ และนำไปใช้วางแผนเมืองต่อได้
 
