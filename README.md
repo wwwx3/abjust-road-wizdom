@@ -113,7 +113,7 @@ Repository นี้สามารถเปิดเผย:
 | Field            | Type        | Description                                               |
 | ---------------- | ----------- | --------------------------------------------------------- |
 | `report_id`      | string      | ID ของรายงาน                                              |
-| `source_system`  | string      | แหล่งที่มาของรายงาน เช่น prototype, Traffy-like API, 1555 |
+| `source_system`  | string      | แหล่งที่มาของรายงาน เช่น prototype, Traffy-like API, BMA1555 |
 | `category`       | string      | ประเภทปัญหาจราจร                                          |
 | `description`    | string      | รายละเอียดจากประชาชน                                      |
 | `lat`            | number      | latitude                                                  |
